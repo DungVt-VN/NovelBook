@@ -16,9 +16,19 @@ namespace api.Data
         {
         }
 
-        public DbSet<UserProfile> UserProfiles { get; set; }
-        public DbSet<Author> Authors { get; set; }
         public DbSet<BookItemBase> BookItems { get; set; }
+        public DbSet<Manga> Mangas { get; set; }
+        public DbSet<Author> Authors { get; set; }
+        public DbSet<Chapter> Chapters { get; set; }
+        public DbSet<BookCategory> BookCategories { get; set; }
+        public DbSet<BookTag> BookTags { get; set; }
+        public DbSet<AnotherName> AnotherNames { get; set; }
+        public DbSet<Comment> Comments { get; set; }
+        public DbSet<UserBook> UserBooks { get; set; }
+        public DbSet<Category> Categories { get; set; }
+        public DbSet<Tag> Tags { get; set; }
+        public DbSet<UserProfile> UserProfiles { get; set; }
+        public DbSet<Images> Images { get; set; }
 
         protected override void OnModelCreating(ModelBuilder builder)
         {
@@ -102,9 +112,9 @@ namespace api.Data
                 .OnDelete(DeleteBehavior.Cascade);
 
             // Thiết lập quan hệ một-nhiều giữa Chapter và Image
-            builder.Entity<Image>()
+            builder.Entity<Images>()
                 .HasOne(p => p.Chapter)
-                .WithMany(b => b.Images)
+                .WithMany(b => b.ImageItems)
                 .HasForeignKey(p => p.ChapterId)
                 .OnDelete(DeleteBehavior.Cascade);
 

@@ -5,7 +5,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace api.Models
 {
-    public class Image
+    public class Images
     {
         [Key]
         public int ImageId { get; set; }

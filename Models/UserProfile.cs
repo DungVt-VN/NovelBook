@@ -1,5 +1,6 @@
 using System;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 using api.Data.Enums;
 
 namespace api.Models
@@ -27,6 +28,7 @@ namespace api.Models
         public string? Address { get; set; } = string.Empty;
 
         [Required]
+        [ForeignKey("AppUser")]
         public string AppUserId { get; set; } = string.Empty;
 
         [Required]

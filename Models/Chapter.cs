@@ -22,7 +22,7 @@ namespace api.Models
         [Required]
         public DateTime PublishedDate { get; set; } = DateTime.Now;
 
-        public List<Image>? Images { get; set; }
+        public List<Images>? ImageItems { get; set; }
 
         [Required]
         public int MangaId { get; set; }

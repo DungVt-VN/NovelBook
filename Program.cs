@@ -16,6 +16,11 @@ var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddControllers();
+
+// Add image containers 
+builder.Services.Configure<ImgurSettings>(builder.Configuration.GetSection("ImgurSettings"));
+
+// ----------------------------------------------------------------
 builder.Services.AddEndpointsApiExplorer();
 
 builder.Services.AddSwaggerGen(c =>
@@ -107,8 +112,24 @@ builder.Services.AddAuthentication(options =>
 // Add Interface Service
 builder.Services.AddScoped<ITokenService, TokenService>();
 builder.Services.AddScoped<IUserProfileRepo, UserProfileRepo>();
+builder.Services.AddScoped<IBookItemRepo, BookItemRepo>();
+builder.Services.AddScoped<IAuthorRepo, AuthorRepo>();
+builder.Services.AddScoped<ICategoryRepo, CategoryRepo>();
+builder.Services.AddScoped<ICommentRepo, CommentRepo>();
 
 var app = builder.Build();
+
+// // Seed the database.
+// using (var scope = app.Services.CreateScope())
+// {
+//     var services = scope.ServiceProvider;
+//     var context = services.GetRequiredService<ApplicationDBContext>();
+
+//     var seed = new Seed(context);
+//     seed.SeedDataContext();
+// }
+
+
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())

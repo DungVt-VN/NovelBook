@@ -12,8 +12,8 @@ using api.Data;
 namespace api.Migrations
 {
     [DbContext(typeof(ApplicationDBContext))]
-    [Migration("20240610174629_init")]
-    partial class init
+    [Migration("20240611121613_init")]
+    partial class InitialMigration
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -54,43 +54,43 @@ namespace api.Migrations
                     b.HasData(
                         new
                         {
-                            Id = "a394afde-9eb1-4c4f-b6b0-ada29a1f33ff",
+                            Id = "3c57d190-56f0-4907-8fcb-c6acf05feb46",
                             Name = "Admin",
                             NormalizedName = "ADMIN"
                         },
                         new
                         {
-                            Id = "c447b22e-7ed3-4922-80cb-b63d30a290d3",
+                            Id = "5eee0eb2-4125-4173-a02a-34725a667bdf",
                             Name = "User",
                             NormalizedName = "USER"
                         },
                         new
                         {
-                            Id = "99c3d31b-a97d-4ae5-9dca-694402376c63",
+                            Id = "85f3eead-3b31-4396-bfb5-91585e582e52",
                             Name = "Moderator",
                             NormalizedName = "MODERATOR"
                         },
                         new
                         {
-                            Id = "87c41be2-4076-472d-a602-6e166901d51b",
+                            Id = "0f49993e-3a12-4287-95bd-615e69f2ee05",
                             Name = "Editor",
                             NormalizedName = "EDITOR"
                         },
                         new
                         {
-                            Id = "ef916dbc-be43-4167-9bea-6bf6d5e41ff2",
+                            Id = "6fadafa2-2561-457f-b4a7-efebaebc81bd",
                             Name = "Creator",
                             NormalizedName = "CREATOR"
                         },
                         new
                         {
-                            Id = "cd62d114-c07f-492b-a384-ce381cfd2d49",
+                            Id = "70c5a6ee-3fa3-4b23-aab6-69929b2afb9e",
                             Name = "Premium",
                             NormalizedName = "PREMIUM"
                         },
                         new
                         {
-                            Id = "0e74689a-6e9f-4fb5-90ec-4c8967b470f5",
+                            Id = "698a3134-754e-4d90-94bc-8fe79d4850ea",
                             Name = "Guest",
                             NormalizedName = "GUEST"
                         });
@@ -220,7 +220,7 @@ namespace api.Migrations
 
                     b.HasIndex("BookId");
 
-                    b.ToTable("AnotherName");
+                    b.ToTable("AnotherNames");
                 });
 
             modelBuilder.Entity("api.Models.AppUser", b =>
@@ -305,7 +305,7 @@ namespace api.Migrations
                     b.Property<DateTime>("DateOfBirth")
                         .HasColumnType("datetime2");
 
-                    b.Property<string>("pseudonym")
+                    b.Property<string>("Pseudonym")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
@@ -326,7 +326,7 @@ namespace api.Migrations
 
                     b.HasIndex("CategoryId");
 
-                    b.ToTable("BookCategory");
+                    b.ToTable("BookCategories");
                 });
 
             modelBuilder.Entity("api.Models.BookItemBase", b =>
@@ -352,11 +352,6 @@ namespace api.Migrations
                     b.Property<string>("Description")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Discriminator")
-                        .IsRequired()
-                        .HasMaxLength(13)
-                        .HasColumnType("nvarchar(13)");
 
                     b.Property<int>("Followed")
                         .HasColumnType("int");
@@ -384,11 +379,9 @@ namespace api.Migrations
 
                     b.HasIndex("AuthorId");
 
-                    b.ToTable("BookItems");
+                    b.ToTable("BookItems", (string)null);
 
-                    b.HasDiscriminator<string>("Discriminator").HasValue("BookItemBase");
-
-                    b.UseTphMappingStrategy();
+                    b.UseTptMappingStrategy();
                 });
 
             modelBuilder.Entity("api.Models.BookTag", b =>
@@ -403,7 +396,7 @@ namespace api.Migrations
 
                     b.HasIndex("TagId");
 
-                    b.ToTable("BookTag");
+                    b.ToTable("BookTags");
                 });
 
             modelBuilder.Entity("api.Models.Category", b =>
@@ -420,7 +413,7 @@ namespace api.Migrations
 
                     b.HasKey("CategoryId");
 
-                    b.ToTable("Category");
+                    b.ToTable("Categories");
                 });
 
             modelBuilder.Entity("api.Models.Chapter", b =>
@@ -430,9 +423,6 @@ namespace api.Migrations
                         .HasColumnType("int");
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("ChapterId"));
-
-                    b.Property<int?>("BookItemId")
-                        .HasColumnType("int");
 
                     b.Property<int>("ChapterNumber")
                         .HasColumnType("int");
@@ -455,7 +445,7 @@ namespace api.Migrations
 
                     b.HasIndex("MangaId");
 
-                    b.ToTable("Chapter");
+                    b.ToTable("Chapters");
                 });
 
             modelBuilder.Entity("api.Models.Comment", b =>
@@ -476,7 +466,7 @@ namespace api.Migrations
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime2");
 
-                    b.Property<int>("Liked")
+                    b.Property<int>("Likes")
                         .HasColumnType("int");
 
                     b.Property<int?>("ParentCommentId")
@@ -494,32 +484,32 @@ namespace api.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("Comment");
+                    b.ToTable("Comments");
                 });
 
-            modelBuilder.Entity("api.Models.Image", b =>
+            modelBuilder.Entity("api.Models.Images", b =>
                 {
-                    b.Property<int>("ImageID")
+                    b.Property<int>("ImageId")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("ImageID"));
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("ImageId"));
 
-                    b.Property<int>("ChapterID")
+                    b.Property<int>("ChapterId")
                         .HasColumnType("int");
 
-                    b.Property<int>("NumericalOreder")
+                    b.Property<int>("NumericalOrder")
                         .HasColumnType("int");
 
-                    b.Property<string>("URL")
+                    b.Property<string>("Url")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.HasKey("ImageID");
+                    b.HasKey("ImageId");
 
-                    b.HasIndex("ChapterID");
+                    b.HasIndex("ChapterId");
 
-                    b.ToTable("Image");
+                    b.ToTable("Images");
                 });
 
             modelBuilder.Entity("api.Models.Tag", b =>
@@ -536,7 +526,7 @@ namespace api.Migrations
 
                     b.HasKey("TagId");
 
-                    b.ToTable("Tag");
+                    b.ToTable("Tags");
                 });
 
             modelBuilder.Entity("api.Models.UserBook", b =>
@@ -566,7 +556,7 @@ namespace api.Migrations
 
                     b.HasIndex("BookItemId");
 
-                    b.ToTable("UserBook");
+                    b.ToTable("UserBooks");
                 });
 
             modelBuilder.Entity("api.Models.UserProfile", b =>
@@ -607,7 +597,7 @@ namespace api.Migrations
                 {
                     b.HasBaseType("api.Models.BookItemBase");
 
-                    b.HasDiscriminator().HasValue("Manga");
+                    b.ToTable("Mangas", (string)null);
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
@@ -680,7 +670,7 @@ namespace api.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("api.Models.Category", "Categorie")
+                    b.HasOne("api.Models.Category", "Category")
                         .WithMany("BookCategories")
                         .HasForeignKey("CategoryId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -688,7 +678,7 @@ namespace api.Migrations
 
                     b.Navigation("BookItem");
 
-                    b.Navigation("Categorie");
+                    b.Navigation("Category");
                 });
 
             modelBuilder.Entity("api.Models.BookItemBase", b =>
@@ -758,11 +748,11 @@ namespace api.Migrations
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("api.Models.Image", b =>
+            modelBuilder.Entity("api.Models.Images", b =>
                 {
                     b.HasOne("api.Models.Chapter", "Chapter")
-                        .WithMany("Images")
-                        .HasForeignKey("ChapterID")
+                        .WithMany("ImageItems")
+                        .HasForeignKey("ChapterId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
@@ -772,13 +762,13 @@ namespace api.Migrations
             modelBuilder.Entity("api.Models.UserBook", b =>
                 {
                     b.HasOne("api.Models.BookItemBase", "BookItem")
-                        .WithMany("UserBook")
+                        .WithMany("UserBooks")
                         .HasForeignKey("BookItemId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.HasOne("api.Models.AppUser", "AppUser")
-                        .WithMany("UserBook")
+                        .WithMany("UserBooks")
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -799,11 +789,20 @@ namespace api.Migrations
                     b.Navigation("AppUser");
                 });
 
+            modelBuilder.Entity("api.Models.Manga", b =>
+                {
+                    b.HasOne("api.Models.BookItemBase", null)
+                        .WithOne()
+                        .HasForeignKey("api.Models.Manga", "BookId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
             modelBuilder.Entity("api.Models.AppUser", b =>
                 {
                     b.Navigation("Comments");
 
-                    b.Navigation("UserBook");
+                    b.Navigation("UserBooks");
 
                     b.Navigation("UserProfile");
                 });
@@ -823,7 +822,7 @@ namespace api.Migrations
 
                     b.Navigation("Comments");
 
-                    b.Navigation("UserBook");
+                    b.Navigation("UserBooks");
                 });
 
             modelBuilder.Entity("api.Models.Category", b =>
@@ -833,7 +832,7 @@ namespace api.Migrations
 
             modelBuilder.Entity("api.Models.Chapter", b =>
                 {
-                    b.Navigation("Images");
+                    b.Navigation("ImageItems");
                 });
 
             modelBuilder.Entity("api.Models.Comment", b =>
