@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 
 namespace api.Controllers
@@ -15,16 +14,27 @@ namespace api.Controllers
         [HttpGet]
         public IActionResult GetAllAsync()
         {
-            // Tạm thời trả về một danh sách rỗng để kiểm tra kết nối API
+            return Ok("Books retrieved successfully!");
+        }
+        [Authorize(Roles = "User")]
+        [HttpGet("{id}")]
+        public IActionResult GetByIdAsync(int id)
+        {
             return Ok("Books retrieved successfully!");
         }
 
-        [HttpGet("{id}")]
-        [Authorize(Roles = "User")]
-        public IActionResult GetByIdAsyn(int id)
+        [Authorize(Roles = "Admin")]
+        [HttpGet("test")]
+        public IActionResult Test()
         {
-            return Ok("Books retrieveuserrrrrrrrrrrrrrr");
+            return Ok("You are a USER");
         }
 
+        [Authorize(Roles = "Guest")]
+        [HttpGet("guest")]
+        public IActionResult Guest()
+        {
+            return Ok("You are a GUEST");
+        }
     }
 }

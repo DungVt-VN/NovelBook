@@ -30,18 +30,11 @@ public class GuestRoleMiddleware
             throw new ArgumentNullException(nameof(context));
         }
 
-        if (context.User?.Identity == null)
-        {
-            _logger.LogInformation("User or User.Identity is null");
-            await _next(context);
-            return;
-        }
-
-        if (!context.User.Identity.IsAuthenticated)
+        if (context.User?.Identity == null || !context.User.Identity.IsAuthenticated)
         {
             var claims = new List<Claim>
             {
-                new Claim(ClaimTypes.Name, "guest"),
+                new Claim(ClaimTypes.Name, "Guest"),
                 new Claim(ClaimTypes.Role, "Guest")
             };
 
@@ -69,8 +62,10 @@ public class GuestRoleMiddleware
 
             _logger.LogDebug("Generated Token: {Token}", tokenString);
 
-            // Use Append or indexer to add/update the header
-            context.Response.Headers["Authorization"] = "Bearer " + tokenString;
+            // Thêm token vào response headers
+            context.Response.Headers["Guest-Authorization"] = "Bearer " + tokenString;
+            
+            // Không thêm token vào request headers để không ghi đè token của người dùng đã đăng nhập
         }
 
         await _next(context);
