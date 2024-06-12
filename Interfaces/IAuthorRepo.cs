@@ -8,6 +8,7 @@ namespace api.Interfaces
 {
     public interface IAuthorRepo
     {
-        Task<Author?> GetAuthor(int bookId);
+        Task<string?> GetAuthorAsync(int bookId);
+        Task<IEnumerable<Author?>> GetAllAuthorAsync();
     }
 }

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using api.Data.Enums;
+using api.Dtos.Book;
 
 namespace api.Models
 {
@@ -39,5 +40,15 @@ namespace api.Models
         public ICollection<AnotherName> AnotherNames { get; set; } = new List<AnotherName>();
         public ICollection<Comment> Comments { get; set; } = new List<Comment>();
         public ICollection<UserBook> UserBooks { get; set; } = new List<UserBook>();
+
+        internal AllBookDto ToViewAllBook(string pseudonym, int commentCount, Category? categories)
+        {
+            throw new NotImplementedException();
+        }
+
+        internal object ToViewAllBookAddAuthor(Task<string?> task)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

@@ -16,19 +16,19 @@ namespace api.Data
         {
         }
 
-        public DbSet<BookItemBase> BookItems { get; set; }
-        public DbSet<Manga> Mangas { get; set; }
-        public DbSet<Author> Authors { get; set; }
-        public DbSet<Chapter> Chapters { get; set; }
-        public DbSet<BookCategory> BookCategories { get; set; }
-        public DbSet<BookTag> BookTags { get; set; }
-        public DbSet<AnotherName> AnotherNames { get; set; }
-        public DbSet<Comment> Comments { get; set; }
-        public DbSet<UserBook> UserBooks { get; set; }
-        public DbSet<Category> Categories { get; set; }
-        public DbSet<Tag> Tags { get; set; }
-        public DbSet<UserProfile> UserProfiles { get; set; }
-        public DbSet<Images> Images { get; set; }
+        public virtual DbSet<BookItemBase> BookItems { get; set; }
+        public virtual DbSet<Manga> Mangas { get; set; }
+        public virtual DbSet<Author> Authors { get; set; }
+        public virtual DbSet<Chapter> Chapters { get; set; }
+        public virtual DbSet<BookCategory> BookCategories { get; set; }
+        public virtual DbSet<BookTag> BookTags { get; set; }
+        public virtual DbSet<AnotherName> AnotherNames { get; set; }
+        public virtual DbSet<Comment> Comments { get; set; }
+        public virtual DbSet<UserBook> UserBooks { get; set; }
+        public virtual DbSet<Category> Categories { get; set; }
+        public virtual DbSet<Tag> Tags { get; set; }
+        public virtual DbSet<UserProfile> UserProfiles { get; set; }
+        public virtual DbSet<Images> Images { get; set; }
 
         protected override void OnModelCreating(ModelBuilder builder)
         {

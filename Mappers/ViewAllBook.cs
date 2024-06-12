@@ -9,7 +9,7 @@ namespace api.Mappers
 {
     public static class ViewAllBook
     {
-        public static AllBookDto ToViewAllBook(this BookItemBase bookItemBase, string author, int commented, ICollection<Category>? categories) {
+        public static AllBookDto ToViewAllBookAddAuthor(this BookItemBase bookItemBase, string author = "Not Found") {
             return new AllBookDto() {
                 Name = bookItemBase.Name,
                 Status = bookItemBase.Status,
@@ -20,9 +20,40 @@ namespace api.Mappers
                 Rating = bookItemBase.Rating,
                 Liked = bookItemBase.Liked,
                 Viewed = bookItemBase.Viewed,
-                Followed = bookItemBase.Followed,
-                Commented = commented,
-                Categories = categories,
+                Followed = bookItemBase.Followed
+            };
+        }
+
+        public static AllBookDto ToViewAllBookAddCommited(this AllBookDto allBookDto, int commented = 0) {
+            return new AllBookDto() {
+                Name = allBookDto.Name,
+                Status = allBookDto.Status,
+                CurrentChapter = allBookDto.CurrentChapter,
+                Description = allBookDto.Description,
+                Author = allBookDto.Author,
+                Voted = allBookDto.Voted,
+                Rating = allBookDto.Rating,
+                Liked = allBookDto.Liked,
+                Viewed = allBookDto.Viewed,
+                Followed = allBookDto.Followed,
+                Commented = commented
+            };
+        }
+
+        public static AllBookDto ToViewAllBookAddCategories(this AllBookDto allBookDto, ICollection<Category> categories) {
+            return new AllBookDto() {
+                Name = allBookDto.Name,
+                Status = allBookDto.Status,
+                CurrentChapter = allBookDto.CurrentChapter,
+                Description = allBookDto.Description,
+                Author = allBookDto.Author,
+                Voted = allBookDto.Voted,
+                Rating = allBookDto.Rating,
+                Liked = allBookDto.Liked,
+                Viewed = allBookDto.Viewed,
+                Followed = allBookDto.Followed,
+                Commented = allBookDto.Commented,
+                Categories = categories
             };
         }
     }

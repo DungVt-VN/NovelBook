@@ -18,16 +18,21 @@ namespace api.Repository
             _context = context;
         }
 
-        public async Task<Author?> GetAuthor(int bookId)
+        public async Task<IEnumerable<Author?>> GetAllAuthorAsync()
         {
-            var author = await _context.Authors.FirstOrDefaultAsync(a => a.AuthorId == bookId);
+            return await _context.Authors.ToListAsync();
+        }
+
+        public async Task<string?> GetAuthorAsync(int authorId)
+        {
+            var author = await _context.Authors.FirstOrDefaultAsync(a => a.AuthorId == authorId);
 
             if (author == null)
             {
                 return null;
             }
 
-            return author;
+            return author.Pseudonym;
         }
     }
 }
