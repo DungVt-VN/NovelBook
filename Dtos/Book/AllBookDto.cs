@@ -20,7 +20,7 @@ namespace api.Dtos.Book
         public int Viewed { get; set; }
         public int Followed { get; set; }
         public int Commented { get; set; }
-        public ICollection<Category>? Categories { get; set; }    
+        public ICollection<String>? Categories { get; set; }    
     }
     
 }

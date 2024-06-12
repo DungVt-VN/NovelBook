@@ -41,7 +41,7 @@ namespace api.Models
         public ICollection<Comment> Comments { get; set; } = new List<Comment>();
         public ICollection<UserBook> UserBooks { get; set; } = new List<UserBook>();
 
-        internal AllBookDto ToViewAllBook(string pseudonym, int commentCount, Category? categories)
+        internal AllBookDto ToViewAllBook(string pseudonym, int commentCount, List<Category?> categories)
         {
             throw new NotImplementedException();
         }

@@ -12,27 +12,24 @@ namespace api.Repository
     public class AuthorRepo : IAuthorRepo
     {
         private readonly ApplicationDBContext _context;
-
         public AuthorRepo(ApplicationDBContext context)
         {
             _context = context;
         }
 
-        public async Task<IEnumerable<Author?>> GetAllAuthorAsync()
+        public async Task<String?> GetAuthorByIdAsync(int authorId)
         {
-            return await _context.Authors.ToListAsync();
+            var result = await _context.Authors.FirstOrDefaultAsync(a => a.AuthorId == authorId);
+            if (result != null) {
+                return result.Pseudonym;
+            }
+            return null;
         }
 
-        public async Task<string?> GetAuthorAsync(int authorId)
+        public async Task<List<Author>> GetAllAuthorsAsync()
         {
-            var author = await _context.Authors.FirstOrDefaultAsync(a => a.AuthorId == authorId);
-
-            if (author == null)
-            {
-                return null;
-            }
-
-            return author.Pseudonym;
+            var result = await _context.Authors.ToListAsync();
+            return result;
         }
     }
 }

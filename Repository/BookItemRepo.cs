@@ -15,7 +15,7 @@ namespace api.Repository
     {
         private readonly ApplicationDBContext _context;
 
-        public BookItemRepo(ApplicationDBContext context, IAuthorRepo authorRepo, 
+        public BookItemRepo(ApplicationDBContext context, IAuthorRepo authorRepo,
             ICommentRepo commentRepo, ICategoryRepo categoryRepo)
         {
             _context = context;
@@ -25,6 +25,22 @@ namespace api.Repository
         {
             var books = await _context.BookItems.ToListAsync();
             return books;
+        }
+
+        public async Task<List<BookItemBase>> GetAllBooksWithAuthorsAsync()
+        {
+            return await _context.BookItems
+                .Include(b => b.Author) // Eager loading to include Author data
+                .ToListAsync();
+        }
+
+        public async Task<List<BookItemBase>> GetAllBooksWithAuthorsAndCategoriesAsync()
+        {
+            return await _context.BookItems
+                .Include(b => b.Author)
+                .Include(b => b.BookCategories)
+                    .ThenInclude(bc => bc.Category)
+                .ToListAsync();
         }
     }
 }

@@ -10,5 +10,7 @@ namespace api.Interfaces
     public interface IBookItemRepo
     {
         Task<ICollection<BookItemBase>> GetAllAsync();
+        Task<List<BookItemBase>> GetAllBooksWithAuthorsAndCategoriesAsync();
+        Task<List<BookItemBase>> GetAllBooksWithAuthorsAsync();
     }
 }

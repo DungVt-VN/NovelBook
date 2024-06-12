@@ -9,8 +9,10 @@ namespace api.Mappers
 {
     public static class ViewAllBook
     {
-        public static AllBookDto ToViewAllBookAddAuthor(this BookItemBase bookItemBase, string author = "Not Found") {
-            return new AllBookDto() {
+        public static AllBookDto ToViewAllBookAddAuthor(this BookItemBase bookItemBase, string author = "Not Found")
+        {
+            return new AllBookDto()
+            {
                 Name = bookItemBase.Name,
                 Status = bookItemBase.Status,
                 CurrentChapter = bookItemBase.CurrentChapter,
@@ -24,8 +26,10 @@ namespace api.Mappers
             };
         }
 
-        public static AllBookDto ToViewAllBookAddCommited(this AllBookDto allBookDto, int commented = 0) {
-            return new AllBookDto() {
+        public static AllBookDto ToViewAllBookAddCommited(this AllBookDto allBookDto, int commented = 0)
+        {
+            return new AllBookDto()
+            {
                 Name = allBookDto.Name,
                 Status = allBookDto.Status,
                 CurrentChapter = allBookDto.CurrentChapter,
@@ -40,8 +44,10 @@ namespace api.Mappers
             };
         }
 
-        public static AllBookDto ToViewAllBookAddCategories(this AllBookDto allBookDto, ICollection<Category> categories) {
-            return new AllBookDto() {
+        public static AllBookDto ToViewAllBookAddCategories(this AllBookDto allBookDto, ICollection<String> categories)
+        {
+            return new AllBookDto()
+            {
                 Name = allBookDto.Name,
                 Status = allBookDto.Status,
                 CurrentChapter = allBookDto.CurrentChapter,
@@ -53,6 +59,24 @@ namespace api.Mappers
                 Viewed = allBookDto.Viewed,
                 Followed = allBookDto.Followed,
                 Commented = allBookDto.Commented,
+                Categories = categories
+            };
+        }
+        public static AllBookDto ToViewAllBook(BookItemBase bookItemBase, string pseudonym, int commentCount, List<String> categories)
+        {
+            return new AllBookDto
+            {
+                Name = bookItemBase.Name,
+                Status = bookItemBase.Status,
+                CurrentChapter = bookItemBase.CurrentChapter,
+                Description = bookItemBase.Description,
+                Author = pseudonym,
+                Voted = bookItemBase.Voted,
+                Rating = bookItemBase.Rating,
+                Liked = bookItemBase.Liked,
+                Viewed = bookItemBase.Viewed,
+                Followed = bookItemBase.Followed,
+                Commented = commentCount,
                 Categories = categories
             };
         }

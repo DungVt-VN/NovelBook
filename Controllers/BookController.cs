@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using api.Dtos.Book;
 using api.Interfaces;
 using api.Mappers;
 using api.Models;
@@ -27,44 +28,32 @@ namespace api.Controllers
             _categoryRepo = categoryRepo;
         }
 
-        [AllowAnonymous]
         [HttpGet]
         public async Task<IActionResult> GetAllAsync()
         {
-            if (!ModelState.IsValid)
-                return BadRequest(ModelState);
-            // Get all books from the database
             var books = await _bookItemRepo.GetAllAsync();
+            var booksWithAuthors = new List<AllBookDto>();
 
-            // Add Author of the book to the list
-            var booksAuthor = books.Select(au => {
-                var author = _authorRepo.GetAuthorAsync(4).ToString();
-                if (author != null)
-                    return au.ToViewAllBookAddAuthor(author);
-                return au.ToViewAllBookAddAuthor();
-            });
-            return Ok(booksAuthor);
-        }
+            // Use foreach to process each book
+            foreach (var book in books)
+            {
+                var author = await _authorRepo.GetAuthorByIdAsync(book.AuthorId);
+                var bookWithAuthor = new AllBookDto();
+                if (author != null) {
+                    bookWithAuthor = book.ToViewAllBookAddAuthor(author);
+                }
+                else {
+                    bookWithAuthor = book.ToViewAllBookAddAuthor();
+                }
+                var commentCount = await _commentRepo.GetCountCommentOfBook(book.BookId);
+                var bookWithComment = bookWithAuthor.ToViewAllBookAddCommited(commentCount);
+                var categoryId = await _categoryRepo.GetCategoryIdAsync(book.BookId);
+                var categories = await _categoryRepo.GetCategoriesAsync(categoryId);
+                var bookWithCategory = bookWithComment.ToViewAllBookAddCategories(categories);
+                booksWithAuthors.Add(bookWithCategory);
+            }
 
-        [Authorize(Roles = "User")]
-        [HttpGet("{id}")]
-        public IActionResult GetByIdAsync(int id)
-        {
-            return Ok("Books retrieved successfully!");
-        }
-
-        [Authorize(Roles = "Admin")]
-        [HttpGet("test")]
-        public IActionResult Test()
-        {
-            return Ok("You are a USER");
-        }
-
-        [Authorize(Roles = "Guest")]
-        [HttpGet("guest")]
-        public IActionResult Guest()
-        {
-            return Ok("You are a GUEST");
+            return Ok(booksWithAuthors);
         }
     }
 }

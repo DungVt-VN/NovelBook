@@ -9,5 +9,6 @@ namespace api.Interfaces
     public interface ICommentRepo
     {
         Task<ICollection<Comment>?> GetAllCommentsOfBook(int bookId);
+        Task<int> GetCountCommentOfBook(int bookId);
     }
 }

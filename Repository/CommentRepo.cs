@@ -21,5 +21,12 @@ namespace api.Repository
             var comments = await _context.Comments.Where(c => c.BookItemId == bookId).ToListAsync();
             return comments;
         }
+
+
+        public async Task<int> GetCountCommentOfBook(int bookId)
+        {
+            var comments = await _context.Comments.Where(c => c.BookItemId == bookId).ToListAsync();
+            return comments.Count;
+        }
     }
 }
