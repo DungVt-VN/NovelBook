@@ -11,6 +11,6 @@ namespace api.Models
         [Required]
         public string CategoryName { get; set; } = string.Empty;
 
-        public ICollection<BookCategory>? BookCategories { get; set; }
+        public ICollection<BookCategory> BookCategories { get; set; }
     }
 }

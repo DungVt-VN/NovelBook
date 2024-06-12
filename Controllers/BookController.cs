@@ -32,28 +32,40 @@ namespace api.Controllers
         public async Task<IActionResult> GetAllAsync()
         {
             var books = await _bookItemRepo.GetAllAsync();
-            var booksWithAuthors = new List<AllBookDto>();
+            var allBook = new List<AllBookDto>();
 
-            // Use foreach to process each book
             foreach (var book in books)
             {
+            // V1
+                // var author = await _authorRepo.GetAuthorByIdAsync(book.AuthorId);
+                // var bookWithAuthor = new AllBookDto();
+                // if (author != null)
+                // {
+                //     bookWithAuthor = book.ToViewAllBookAddAuthor(author);
+                // }
+                // else
+                // {
+                //     bookWithAuthor = book.ToViewAllBookAddAuthor();
+                // }
+                // var commentCount = await _commentRepo.GetCountCommentOfBook(book.BookId);
+                // var bookWithComment = bookWithAuthor.ToViewAllBookAddCommited(commentCount);
+                // var categoryId = await _categoryRepo.GetCategoryIdAsync(book.BookId);
+                // var categories = await _categoryRepo.GetCategoriesAsync(categoryId);
+                // var bookWithCategory = bookWithComment.ToViewAllBookAddCategories(categories);
+                // allBook.Add(bookWithCategory);
+
                 var author = await _authorRepo.GetAuthorByIdAsync(book.AuthorId);
-                var bookWithAuthor = new AllBookDto();
-                if (author != null) {
-                    bookWithAuthor = book.ToViewAllBookAddAuthor(author);
-                }
-                else {
-                    bookWithAuthor = book.ToViewAllBookAddAuthor();
-                }
+                var pseudonym = author ?? "Unknown Author"; // Sử dụng "Unknown Author" nếu author là null
+
                 var commentCount = await _commentRepo.GetCountCommentOfBook(book.BookId);
-                var bookWithComment = bookWithAuthor.ToViewAllBookAddCommited(commentCount);
-                var categoryId = await _categoryRepo.GetCategoryIdAsync(book.BookId);
-                var categories = await _categoryRepo.GetCategoriesAsync(categoryId);
-                var bookWithCategory = bookWithComment.ToViewAllBookAddCategories(categories);
-                booksWithAuthors.Add(bookWithCategory);
+                var categoryIds = await _categoryRepo.GetCategoryIdAsync(book.BookId);
+                var categories = await _categoryRepo.GetCategoriesAsync(categoryIds);
+
+                var bookWithAuthor = book.ToViewAllBook(pseudonym, commentCount, categories);
+                allBook.Add(bookWithAuthor);
             }
 
-            return Ok(booksWithAuthors);
+            return Ok(allBook);
         }
     }
 }

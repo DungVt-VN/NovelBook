@@ -40,15 +40,5 @@ namespace api.Models
         public ICollection<AnotherName> AnotherNames { get; set; } = new List<AnotherName>();
         public ICollection<Comment> Comments { get; set; } = new List<Comment>();
         public ICollection<UserBook> UserBooks { get; set; } = new List<UserBook>();
-
-        internal AllBookDto ToViewAllBook(string pseudonym, int commentCount, List<Category?> categories)
-        {
-            throw new NotImplementedException();
-        }
-
-        internal object ToViewAllBookAddAuthor(Task<string?> task)
-        {
-            throw new NotImplementedException();
-        }
     }
 }
