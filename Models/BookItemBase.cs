@@ -6,7 +6,7 @@ using api.Data.Enums;
 
 namespace api.Models
 {
-    public abstract class BookItemBase
+    public class BookItemBase
     {
         [Key]
         public int BookId { get; set; }
