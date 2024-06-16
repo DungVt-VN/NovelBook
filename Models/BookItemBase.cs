@@ -14,6 +14,7 @@ namespace api.Models
 
         [Required]
         public string Name { get; set; } = string.Empty;
+        public string CoverImage { get; set; } = string.Empty;
 
         public BookStatusEnum Status { get; set; }
         public int CurrentChapter { get; set; }

@@ -67,7 +67,9 @@ namespace api.Mappers
         {
             return new AllBookDto
             {
+                bookId = bookItemBase.BookId,
                 Name = bookItemBase.Name,
+                CoverImage = bookItemBase.CoverImage,
                 Status = bookItemBase.Status,
                 CurrentChapter = bookItemBase.CurrentChapter,
                 Description = bookItemBase.Description,

@@ -29,7 +29,7 @@ namespace api.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> GetAllAsync()
+        public async Task<IActionResult> GetAllBookAsync()
         {
             var books = await _bookItemRepo.GetAllAsync();
             var allBook = new List<AllBookDto>();
@@ -67,5 +67,11 @@ namespace api.Controllers
 
             return Ok(allBook);
         }
+
+        // [HttpGet("{id}")]
+        // public async Task<IActionResult> GetDetailBookAsync(int id)
+        // {
+        //     return
+        // }
     }
 }

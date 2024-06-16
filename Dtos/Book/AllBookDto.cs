@@ -9,7 +9,9 @@ namespace api.Dtos.Book
 {
     public class AllBookDto
     {
+        public int bookId { get; set; }
         public string Name { get; set; } = string.Empty;
+        public string CoverImage { get; set; } = string.Empty;
         public BookStatusEnum Status { get; set; }
         public int CurrentChapter { get; set; }
         public string Description { get; set; } = string.Empty;
