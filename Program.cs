@@ -114,20 +114,20 @@ builder.Services.AddAuthentication(options =>
 .AddGoogle(options =>
 {
     var googleAuthSection = builder.Configuration.GetSection("Authentication:Google");
-    options.ClientId = googleAuthSection["ClientId"];
-    options.ClientSecret = googleAuthSection["ClientSecret"];
+    options.ClientId = googleAuthSection["ClientId"] ?? throw new InvalidOperationException("Google ClientId not configured.");
+    options.ClientSecret = googleAuthSection["ClientSecret"] ?? throw new InvalidOperationException("Google ClientSecret not configured.");
 })
 .AddFacebook(options =>
 {
     var facebookAuthSection = builder.Configuration.GetSection("Authentication:Facebook");
-    options.AppId = facebookAuthSection["AppId"];
-    options.AppSecret = facebookAuthSection["AppSecret"];
+    options.AppId = facebookAuthSection["AppId"] ?? throw new InvalidOperationException("Facebook AppId not configured.");
+    options.AppSecret = facebookAuthSection["AppSecret"] ?? throw new InvalidOperationException("Facebook AppSecret not configured.");
 })
 .AddTwitter(options =>
 {
     var twitterAuthSection = builder.Configuration.GetSection("Authentication:Twitter");
-    options.ConsumerKey = twitterAuthSection["ConsumerKey"];
-    options.ConsumerSecret = twitterAuthSection["ConsumerSecret"];
+    options.ConsumerKey = twitterAuthSection["ConsumerKey"] ?? throw new InvalidOperationException("Twitter ConsumerKey not configured.");
+    options.ConsumerSecret = twitterAuthSection["ConsumerSecret"] ?? throw new InvalidOperationException("Twitter ConsumerSecret not configured.");
     options.RetrieveUserDetails = true;
 });
 
