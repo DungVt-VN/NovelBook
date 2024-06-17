@@ -23,27 +23,25 @@ namespace api.Service
         {
             _config = config;
             _userManager = userManager;
+
             var signingKey = _config["JWT:SigningKey"];
-            if (signingKey != null)
+            if (string.IsNullOrEmpty(signingKey))
             {
-                _key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(signingKey));
+                throw new InvalidOperationException("JWT SigningKey is not configured.");
             }
-            else
-            {
-                throw new InvalidOperationException("JWT SigningKey is null.");
-            }
+            _key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(signingKey));
         }
 
         public async Task<string> CreateToken(AppUser user)
         {
             var claims = new List<Claim>();
 
-            if (user.Email != null)
+            if (!string.IsNullOrEmpty(user.Email))
             {
                 claims.Add(new Claim(JwtRegisteredClaimNames.Email, user.Email));
             }
 
-            if (user.UserName != null)
+            if (!string.IsNullOrEmpty(user.UserName))
             {
                 claims.Add(new Claim(JwtRegisteredClaimNames.GivenName, user.UserName));
             }
@@ -67,6 +65,27 @@ namespace api.Service
             var token = tokenHandler.CreateToken(tokenDescriptor);
 
             return tokenHandler.WriteToken(token);
+        }
+
+        public async Task<string> GenerateJwtToken(ClaimsPrincipal principal)
+        {
+            var claims = principal.Claims;
+            var signingKey = _config["JWT:SigningKey"];
+            if (string.IsNullOrEmpty(signingKey))
+            {
+                throw new InvalidOperationException("JWT SigningKey is not configured.");
+            }
+            var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(signingKey));
+            var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
+
+            var token = new JwtSecurityToken(
+                issuer: _config["JWT:Issuer"],
+                audience: _config["JWT:Audience"],
+                claims: claims,
+                expires: DateTime.Now.AddMinutes(30),
+                signingCredentials: creds);
+
+            return await Task.FromResult(new JwtSecurityTokenHandler().WriteToken(token));
         }
     }
 }

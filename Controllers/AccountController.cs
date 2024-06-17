@@ -5,11 +5,17 @@ using System.Threading.Tasks;
 using api.Dtos.Account;
 using api.Interfaces;
 using api.Models;
+using MailKit;
 using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Authentication.Facebook;
+using Microsoft.AspNetCore.Authentication.Google;
+using Microsoft.AspNetCore.Authentication.Twitter;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Caching.Memory;
 
 namespace api.Controllers
 {
@@ -19,14 +25,20 @@ namespace api.Controllers
     {
         private readonly UserManager<AppUser> _userManager;
         private readonly ITokenService _tokenService;
-        private readonly SignInManager<AppUser> _signinManager;
+        private readonly SignInManager<AppUser> _signInManager;
         private readonly IUserProfileRepo _userProfileRepo;
 
-        public AccountController(UserManager<AppUser> userManager, ITokenService tokenService, SignInManager<AppUser> signInManager, IUserProfileRepo userProfileRepo)
+
+        public AccountController(
+            UserManager<AppUser> userManager,
+            ITokenService tokenService,
+            SignInManager<AppUser> signInManager,
+            IUserProfileRepo userProfileRepo,
+            IEmailService emailService)
         {
             _userManager = userManager;
             _tokenService = tokenService;
-            _signinManager = signInManager;
+            _signInManager = signInManager;
             _userProfileRepo = userProfileRepo;
         }
 
@@ -42,7 +54,7 @@ namespace api.Controllers
 
             if (user == null) return Unauthorized("Invalid username");
 
-            var result = await _signinManager.CheckPasswordSignInAsync(user, loginDto.Password, false);
+            var result = await _signInManager.CheckPasswordSignInAsync(user, loginDto.Password, false);
 
             if (!result.Succeeded) return Unauthorized("Password incorrect");
 
@@ -135,29 +147,62 @@ namespace api.Controllers
             }
         }
 
-        [HttpPost("forgotpassword")]
-        public async Task<IActionResult> GetEmailAsync([FromBody] FogotPWDto fogotPWDto)
+        
+
+        // --------------------------------------------------------------------------------------------------------------------
+
+
+        [HttpGet("login/google")]
+        public IActionResult LoginWithGoogle()
         {
-            if (!ModelState.IsValid)
-                return BadRequest(ModelState);
-
-            if (string.IsNullOrEmpty(fogotPWDto.email))
-                return BadRequest("Password is required");
-
-            // Optionally, you can validate email format here if needed
-
-            var normalizedEmail = fogotPWDto.email.ToUpper();
-            var user = await _userManager.Users.FirstOrDefaultAsync(e => e.NormalizedEmail == normalizedEmail);
-
-            if (user == null)
-            {
-                // Handle case where user with the given email does not exist
-                return NotFound("User not found.");
-            }
-
-            // Handle case where user is found
-            return Ok("User is Valid!"); // You can return additional data here if needed
+            var properties = new AuthenticationProperties { RedirectUri = Url.Action("GoogleResponse") };
+            return Challenge(properties, GoogleDefaults.AuthenticationScheme);
         }
+
+        [HttpGet("google-response")]
+        public async Task<IActionResult> GoogleResponse()
+        {
+            var result = await HttpContext.AuthenticateAsync(CookieAuthenticationDefaults.AuthenticationScheme);
+            if (!result.Succeeded) return BadRequest();
+
+            var token = await _tokenService.GenerateJwtToken(result.Principal);
+            return Ok(new { Token = token });
+        }
+
+        [HttpGet("login/facebook")]
+        public IActionResult LoginWithFacebook()
+        {
+            var properties = new AuthenticationProperties { RedirectUri = Url.Action("FacebookResponse") };
+            return Challenge(properties, FacebookDefaults.AuthenticationScheme);
+        }
+
+        [HttpGet("facebook-response")]
+        public async Task<IActionResult> FacebookResponse()
+        {
+            var result = await HttpContext.AuthenticateAsync(CookieAuthenticationDefaults.AuthenticationScheme);
+            if (!result.Succeeded) return BadRequest();
+
+            var token = await _tokenService.GenerateJwtToken(result.Principal);
+            return Ok(new { Token = token });
+        }
+
+        [HttpGet("login/twitter")]
+        public IActionResult LoginWithTwitter()
+        {
+            var properties = new AuthenticationProperties { RedirectUri = Url.Action("TwitterResponse") };
+            return Challenge(properties, TwitterDefaults.AuthenticationScheme);
+        }
+
+        [HttpGet("twitter-response")]
+        public async Task<IActionResult> TwitterResponse()
+        {
+            var result = await HttpContext.AuthenticateAsync(CookieAuthenticationDefaults.AuthenticationScheme);
+            if (!result.Succeeded) return BadRequest();
+
+            var token = await _tokenService.GenerateJwtToken(result.Principal);
+            return Ok(new { Token = token });
+        }
+
 
     }
 

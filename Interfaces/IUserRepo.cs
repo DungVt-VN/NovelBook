@@ -7,6 +7,7 @@ namespace api.Interfaces
 {
     public interface IUserRepo
     {
+        Task<Boolean> GetExistingEmailAsync(string email);
         
     }
 }

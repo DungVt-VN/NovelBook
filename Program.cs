@@ -131,6 +131,8 @@ builder.Services.AddAuthentication(options =>
     options.RetrieveUserDetails = true;
 });
 
+builder.Services.AddMemoryCache();
+
 // Add Interface Service
 builder.Services.AddScoped<ITokenService, TokenService>();
 builder.Services.AddScoped<IUserProfileRepo, UserProfileRepo>();
@@ -138,6 +140,8 @@ builder.Services.AddScoped<IBookItemRepo, BookItemRepo>();
 builder.Services.AddScoped<IAuthorRepo, AuthorRepo>();
 builder.Services.AddScoped<ICategoryRepo, CategoryRepo>();
 builder.Services.AddScoped<ICommentRepo, CommentRepo>();
+builder.Services.AddSingleton(builder.Configuration.GetSection("EmailSettings").Get<EmailSettings>()!);
+builder.Services.AddTransient<IEmailService, EmailService>();
 
 var app = builder.Build();
 
