@@ -33,6 +33,15 @@ namespace api.Data
         protected override void OnModelCreating(ModelBuilder builder)
         {
             base.OnModelCreating(builder);
+            // Cấu hình ràng buộc duy nhất cho trường Email
+            builder.Entity<AppUser>()
+                .HasIndex(u => u.Email)
+                .IsUnique();
+
+            // Cấu hình ràng buộc duy nhất cho trường Email
+            builder.Entity<AppUser>()
+                .HasIndex(u => u.NormalizedEmail)
+                .IsUnique();
 
             // Cấu hình TPT (Table Per Type) cho các thực thể kế thừa
             builder.Entity<BookItemBase>().ToTable("BookItems");

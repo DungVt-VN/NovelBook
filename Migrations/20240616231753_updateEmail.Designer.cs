@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using api.Data;
 
@@ -11,9 +12,11 @@ using api.Data;
 namespace api.Migrations
 {
     [DbContext(typeof(ApplicationDBContext))]
-    partial class ApplicationDBContextModelSnapshot : ModelSnapshot
+    [Migration("20240616231753_updateEmail")]
+    partial class updateEmail
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -51,43 +54,43 @@ namespace api.Migrations
                     b.HasData(
                         new
                         {
-                            Id = "9feda044-42fb-42b4-ae64-7e9a02dd8227",
+                            Id = "36c433bd-cf7c-4370-8fc7-3c652f916f9f",
                             Name = "Admin",
                             NormalizedName = "ADMIN"
                         },
                         new
                         {
-                            Id = "5d80a7f5-a515-47f1-a7c5-906b1198efdf",
+                            Id = "8138b755-33dc-4692-9b36-a1e7322bd3e2",
                             Name = "User",
                             NormalizedName = "USER"
                         },
                         new
                         {
-                            Id = "6d998896-fe61-42c0-b4e8-429bc3ee622c",
+                            Id = "f4963688-88b6-4f04-a451-8b69f097cbcd",
                             Name = "Moderator",
                             NormalizedName = "MODERATOR"
                         },
                         new
                         {
-                            Id = "a7390a21-e4d8-46ae-8fcb-6a2064d690e0",
+                            Id = "7385780a-103f-4027-81af-d84ff135c4e3",
                             Name = "Editor",
                             NormalizedName = "EDITOR"
                         },
                         new
                         {
-                            Id = "f392e91d-43a7-49de-a82f-85b0a755fb51",
+                            Id = "c0218a26-8998-447d-acfe-c092765e62e0",
                             Name = "Creator",
                             NormalizedName = "CREATOR"
                         },
                         new
                         {
-                            Id = "93bb6a62-1eea-428e-babd-8931c9b4ade7",
+                            Id = "6307a94a-4047-47a3-b2e4-c1ec78ecff49",
                             Name = "Premium",
                             NormalizedName = "PREMIUM"
                         },
                         new
                         {
-                            Id = "6ef75a18-a507-4f98-8c75-ee6e355a4f7d",
+                            Id = "29d48bab-89f8-47d1-aa89-f39c3bb4a1bd",
                             Name = "Guest",
                             NormalizedName = "GUEST"
                         });

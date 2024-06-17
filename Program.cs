@@ -5,6 +5,9 @@ using api.Models;
 using api.Repository;
 using api.Service;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authentication.Google;
+using Microsoft.AspNetCore.Authentication.Facebook;
+using Microsoft.AspNetCore.Authentication.Twitter;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
@@ -107,6 +110,25 @@ builder.Services.AddAuthentication(options =>
         // Xử lý trường hợp SigningKey là null
         Console.WriteLine("Error: JWT Signing Key is not configured.");
     }
+})
+.AddGoogle(options =>
+{
+    var googleAuthSection = builder.Configuration.GetSection("Authentication:Google");
+    options.ClientId = googleAuthSection["ClientId"];
+    options.ClientSecret = googleAuthSection["ClientSecret"];
+})
+.AddFacebook(options =>
+{
+    var facebookAuthSection = builder.Configuration.GetSection("Authentication:Facebook");
+    options.AppId = facebookAuthSection["AppId"];
+    options.AppSecret = facebookAuthSection["AppSecret"];
+})
+.AddTwitter(options =>
+{
+    var twitterAuthSection = builder.Configuration.GetSection("Authentication:Twitter");
+    options.ConsumerKey = twitterAuthSection["ConsumerKey"];
+    options.ConsumerSecret = twitterAuthSection["ConsumerSecret"];
+    options.RetrieveUserDetails = true;
 });
 
 // Add Interface Service
@@ -118,18 +140,6 @@ builder.Services.AddScoped<ICategoryRepo, CategoryRepo>();
 builder.Services.AddScoped<ICommentRepo, CommentRepo>();
 
 var app = builder.Build();
-
-// // Seed the database.
-// using (var scope = app.Services.CreateScope())
-// {
-//     var services = scope.ServiceProvider;
-//     var context = services.GetRequiredService<ApplicationDBContext>();
-
-//     var seed = new Seed(context);
-//     seed.SeedDataContext();
-// }
-
-
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())

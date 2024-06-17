@@ -38,9 +38,9 @@ namespace api.Controllers
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            var user = await _userManager.Users.FirstOrDefaultAsync(x => x.UserName == loginDto.Username.ToLower());
+            var user = await _userManager.Users.FirstOrDefaultAsync(x => x.Email == loginDto.Email.ToLower());
 
-            if (user == null) return Unauthorized("Invalid username!");
+            if (user == null) return Unauthorized("Invalid username");
 
             var result = await _signinManager.CheckPasswordSignInAsync(user, loginDto.Password, false);
 
@@ -76,11 +76,9 @@ namespace api.Controllers
                 };
                 var userProfile = new UserProfile
                 {
-                    AvatarURL = registerDto.AvatarURL,
                     FirstName = registerDto.FirstName,
                     LastName = registerDto.LastName,
                     DateOfBirth = registerDto.DateOfBirth,
-                    Address = registerDto.Address,
                     Gender = registerDto.Gender,
                     AppUserId = appUser.Id,
                     AppUser = appUser
@@ -119,16 +117,48 @@ namespace api.Controllers
             }
         }
 
-
         // Logout
         [HttpPost("logout")]
         [Authorize]
         public async Task<IActionResult> Logout()
         {
-            await HttpContext.SignOutAsync(IdentityConstants.ApplicationScheme);
-            await HttpContext.SignOutAsync(IdentityConstants.ExternalScheme);
-            await HttpContext.SignOutAsync(IdentityConstants.TwoFactorUserIdScheme);
-            return Ok("Logout Success!");
+            try
+            {
+                await HttpContext.SignOutAsync(IdentityConstants.ApplicationScheme);
+                await HttpContext.SignOutAsync(IdentityConstants.ExternalScheme);
+                await HttpContext.SignOutAsync(IdentityConstants.TwoFactorUserIdScheme);
+                return Ok("Logout Success!");
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, "An error occurred during logout." + ex.Message);
+            }
         }
+
+        [HttpPost("forgotpassword")]
+        public async Task<IActionResult> GetEmailAsync([FromBody] FogotPWDto fogotPWDto)
+        {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
+            if (string.IsNullOrEmpty(fogotPWDto.email))
+                return BadRequest("Password is required");
+
+            // Optionally, you can validate email format here if needed
+
+            var normalizedEmail = fogotPWDto.email.ToUpper();
+            var user = await _userManager.Users.FirstOrDefaultAsync(e => e.NormalizedEmail == normalizedEmail);
+
+            if (user == null)
+            {
+                // Handle case where user with the given email does not exist
+                return NotFound("User not found.");
+            }
+
+            // Handle case where user is found
+            return Ok("User is Valid!"); // You can return additional data here if needed
+        }
+
     }
+
 }
