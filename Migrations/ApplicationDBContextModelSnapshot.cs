@@ -51,43 +51,43 @@ namespace api.Migrations
                     b.HasData(
                         new
                         {
-                            Id = "9feda044-42fb-42b4-ae64-7e9a02dd8227",
+                            Id = "2caba31f-9cc4-46d2-a61a-c9e8615b6598",
                             Name = "Admin",
                             NormalizedName = "ADMIN"
                         },
                         new
                         {
-                            Id = "5d80a7f5-a515-47f1-a7c5-906b1198efdf",
+                            Id = "728673fa-fbf9-4531-b6ea-f888a07127f6",
                             Name = "User",
                             NormalizedName = "USER"
                         },
                         new
                         {
-                            Id = "6d998896-fe61-42c0-b4e8-429bc3ee622c",
+                            Id = "aab3fc2f-e619-4850-87b2-d661d911fd52",
                             Name = "Moderator",
                             NormalizedName = "MODERATOR"
                         },
                         new
                         {
-                            Id = "a7390a21-e4d8-46ae-8fcb-6a2064d690e0",
+                            Id = "d5a978c2-95c8-43c4-bf33-5c001ad74d15",
                             Name = "Editor",
                             NormalizedName = "EDITOR"
                         },
                         new
                         {
-                            Id = "f392e91d-43a7-49de-a82f-85b0a755fb51",
+                            Id = "ed6dee2e-ee7a-4dd9-ac5e-18af77ec892a",
                             Name = "Creator",
                             NormalizedName = "CREATOR"
                         },
                         new
                         {
-                            Id = "93bb6a62-1eea-428e-babd-8931c9b4ade7",
+                            Id = "7dd2e853-4419-40a7-a52a-9f9aa4182f84",
                             Name = "Premium",
                             NormalizedName = "PREMIUM"
                         },
                         new
                         {
-                            Id = "6ef75a18-a507-4f98-8c75-ee6e355a4f7d",
+                            Id = "2b8367d9-df3a-42a8-9d04-62c6fd66ce2b",
                             Name = "Guest",
                             NormalizedName = "GUEST"
                         });
@@ -262,6 +262,9 @@ namespace api.Migrations
                     b.Property<bool>("PhoneNumberConfirmed")
                         .HasColumnType("bit");
 
+                    b.Property<string>("Roles")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<string>("SecurityStamp")
                         .HasColumnType("nvarchar(max)");
 
@@ -340,6 +343,9 @@ namespace api.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("BookId"));
 
+                    b.Property<bool>("Actived")
+                        .HasColumnType("bit");
+
                     b.Property<int>("AuthorId")
                         .HasColumnType("int");
 
@@ -370,6 +376,14 @@ namespace api.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<string>("NameUrl")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("OwnerId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
                     b.Property<int>("Rating")
                         .HasColumnType("int");
 
@@ -385,6 +399,8 @@ namespace api.Migrations
                     b.HasKey("BookId");
 
                     b.HasIndex("AuthorId");
+
+                    b.HasIndex("OwnerId");
 
                     b.ToTable("BookItems", (string)null);
 
@@ -448,6 +464,9 @@ namespace api.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<int>("viewed")
+                        .HasColumnType("int");
+
                     b.HasKey("ChapterId");
 
                     b.HasIndex("MangaId");
@@ -492,6 +511,26 @@ namespace api.Migrations
                     b.HasIndex("UserId");
 
                     b.ToTable("Comments");
+                });
+
+            modelBuilder.Entity("api.Models.Emoji", b =>
+                {
+                    b.Property<int>("EmojiId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("EmojiId"));
+
+                    b.Property<int>("NumberEmoji")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Url")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("EmojiId");
+
+                    b.ToTable("Emojis");
                 });
 
             modelBuilder.Entity("api.Models.Images", b =>
@@ -696,6 +735,14 @@ namespace api.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.HasOne("api.Models.AppUser", "AppUser")
+                        .WithMany("BookItems")
+                        .HasForeignKey("OwnerId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("AppUser");
+
                     b.Navigation("Author");
                 });
 
@@ -807,6 +854,8 @@ namespace api.Migrations
 
             modelBuilder.Entity("api.Models.AppUser", b =>
                 {
+                    b.Navigation("BookItems");
+
                     b.Navigation("Comments");
 
                     b.Navigation("UserBooks");

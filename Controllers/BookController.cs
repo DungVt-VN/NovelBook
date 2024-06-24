@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using api.Dtos.Book;
+using api.Helpers;
 using api.Interfaces;
 using api.Mappers;
 using api.Models;
@@ -19,13 +20,22 @@ namespace api.Controllers
         private readonly IAuthorRepo _authorRepo;
         private readonly ICommentRepo _commentRepo;
         private readonly ICategoryRepo _categoryRepo;
+        private readonly IAnotherNameRepo _anotherNameRepo;
+        private readonly ITagRepo _tagRepo;
 
-        public BookController(IBookItemRepo bookItemRepo, IAuthorRepo authorRepo, ICommentRepo commentRepo, ICategoryRepo categoryRepo)
+        public BookController(IBookItemRepo bookItemRepo,
+            IAuthorRepo authorRepo,
+            ICommentRepo commentRepo,
+            ICategoryRepo categoryRepo,
+            IAnotherNameRepo anotherNameRepo,
+            ITagRepo tagRepo)
         {
             _bookItemRepo = bookItemRepo;
             _authorRepo = authorRepo;
             _commentRepo = commentRepo;
             _categoryRepo = categoryRepo;
+            _anotherNameRepo = anotherNameRepo;
+            _tagRepo = tagRepo;
         }
 
         [HttpGet]
@@ -36,30 +46,12 @@ namespace api.Controllers
 
             foreach (var book in books)
             {
-            // V1
-                // var author = await _authorRepo.GetAuthorByIdAsync(book.AuthorId);
-                // var bookWithAuthor = new AllBookDto();
-                // if (author != null)
-                // {
-                //     bookWithAuthor = book.ToViewAllBookAddAuthor(author);
-                // }
-                // else
-                // {
-                //     bookWithAuthor = book.ToViewAllBookAddAuthor();
-                // }
-                // var commentCount = await _commentRepo.GetCountCommentOfBook(book.BookId);
-                // var bookWithComment = bookWithAuthor.ToViewAllBookAddCommited(commentCount);
-                // var categoryId = await _categoryRepo.GetCategoryIdAsync(book.BookId);
-                // var categories = await _categoryRepo.GetCategoriesAsync(categoryId);
-                // var bookWithCategory = bookWithComment.ToViewAllBookAddCategories(categories);
-                // allBook.Add(bookWithCategory);
-
                 var author = await _authorRepo.GetAuthorByIdAsync(book.AuthorId);
                 var pseudonym = author ?? "Unknown Author"; // Sử dụng "Unknown Author" nếu author là null
 
                 var commentCount = await _commentRepo.GetCountCommentOfBook(book.BookId);
-                var categoryIds = await _categoryRepo.GetCategoryIdAsync(book.BookId);
-                var categories = await _categoryRepo.GetCategoriesAsync(categoryIds);
+
+                var categories = await _categoryRepo.GetCategoryByIdAsync(book.BookId);
 
                 var bookWithAuthor = book.ToViewAllBook(pseudonym, commentCount, categories);
                 allBook.Add(bookWithAuthor);
@@ -68,10 +60,57 @@ namespace api.Controllers
             return Ok(allBook);
         }
 
-        // [HttpGet("{id}")]
-        // public async Task<IActionResult> GetDetailBookAsync(int id)
-        // {
-        //     return
-        // }
+        [HttpGet("{id}")]
+        public async Task<IActionResult> GetDetailBookAsync([FromRoute] string id)
+        {
+            var book = await _bookItemRepo.GetBookByIdAsync(id);
+            if (book == null)
+            {
+                return NotFound("Book not found!");
+            }
+            var author = await _authorRepo.GetAuthorByIdAsync(book.AuthorId);
+            var pseudonym = author ?? "Unknown Author"; // Sử dụng "Unknown Author" nếu author là null
+
+            var commentCount = await _commentRepo.GetCountCommentOfBook(book.BookId);
+            var categories = await _categoryRepo.GetCategoryByIdAsync(book.BookId);
+            var tags = await _tagRepo.GetTagByIdAsync(book.BookId);
+            var anotherNames = await _anotherNameRepo.GetAnotherNameByIdAsync(book.BookId);
+
+            var bookWithAuthor = book.ToViewDetailBook(pseudonym, commentCount, categories, tags, anotherNames);
+            return Ok(bookWithAuthor);
+        }
+
+        [HttpPost("edit")]
+        public async Task<IActionResult> PostEditBookAsync([FromBody] EditBookDto editBookDto)
+        {
+            var result = editBookDto.ToEditBook();
+            if (result.HasValue)
+            {
+                var (editBook, categories, tags, author) = result.Value;
+                // Sử dụng editBook, categories, tags, và author
+                var authorId = await _authorRepo.GetAuthorByNameAsync(author ?? "unknown");
+                if (authorId == null)
+                {
+                    authorId = await _authorRepo.UpdateNewAuthorAsync(author ?? "unknown");
+                    if (authorId == null)
+                    {
+                        return BadRequest("Tên tác giả không hợp lệ.");
+                    }
+                }
+                editBook.AuthorId = (int)authorId;
+                var (messageBook, idNewBook) = await _bookItemRepo.UpdateBookAsync(editBook);
+                var messageCategory = await _categoryRepo.UpdateCategoryAsync(categories, idNewBook);
+                var messageTag = await _tagRepo.UpdateTagAsync(tags, idNewBook);
+                if (messageCategory == null || messageTag == null || messageBook == null)
+                {
+                    return BadRequest(messageBook + messageCategory + messageTag);
+                }
+            }
+            else
+            {
+                return BadRequest("Dữ liệu không hợp lệ.");
+            }
+            return Ok("Update Success!!!");
+        }
     }
 }

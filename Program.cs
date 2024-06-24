@@ -80,6 +80,14 @@ builder.Services.AddIdentity<AppUser, IdentityRole>(options =>
 .AddEntityFrameworkStores<ApplicationDBContext>()
 .AddDefaultTokenProviders();
 
+builder.Services.Configure<IdentityOptions>(options =>
+{
+    options.Lockout.AllowedForNewUsers = true;
+    options.Lockout.DefaultLockoutTimeSpan = TimeSpan.FromMinutes(15);
+    options.Lockout.MaxFailedAccessAttempts = 5;
+});
+
+
 // Authentication Middleware
 builder.Services.AddAuthentication(options =>
 {
@@ -142,8 +150,26 @@ builder.Services.AddScoped<ICategoryRepo, CategoryRepo>();
 builder.Services.AddScoped<ICommentRepo, CommentRepo>();
 builder.Services.AddSingleton(builder.Configuration.GetSection("EmailSettings").Get<EmailSettings>()!);
 builder.Services.AddTransient<IEmailService, EmailService>();
+builder.Services.AddScoped<IUserRepo, UserRepo>();
+builder.Services.AddScoped<ITagRepo, TagRepo>();
+builder.Services.AddScoped<IAnotherNameRepo, AnotherNameRepo>();
+
 
 var app = builder.Build();
+
+
+// Seed the database.
+
+// using (var scope = app.Services.CreateScope())
+// {
+//     var services = scope.ServiceProvider;
+//     var context = services.GetRequiredService<ApplicationDBContext>();
+
+//     var seed = new Seed(context);
+//     seed.SeedDataContext();
+// }
+
+// end seeding data
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
@@ -166,5 +192,6 @@ app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();
+
 
 app.Run();

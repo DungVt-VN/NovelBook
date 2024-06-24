@@ -38,7 +38,7 @@ namespace api.Service
 
             if (!string.IsNullOrEmpty(user.Email))
             {
-                claims.Add(new Claim(JwtRegisteredClaimNames.Email, user.Email));
+                claims.Add(new Claim(JwtRegisteredClaimNames.NameId, user.Id));
             }
 
             if (!string.IsNullOrEmpty(user.UserName))

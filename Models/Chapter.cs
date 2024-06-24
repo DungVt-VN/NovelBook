@@ -21,6 +21,7 @@ namespace api.Models
 
         [Required]
         public DateTime PublishedDate { get; set; } = DateTime.Now;
+        public int viewed { get; set; } = 0;
 
         public List<Images>? ImageItems { get; set; }
 

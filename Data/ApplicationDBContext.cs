@@ -29,10 +29,18 @@ namespace api.Data
         public virtual DbSet<Tag> Tags { get; set; }
         public virtual DbSet<UserProfile> UserProfiles { get; set; }
         public virtual DbSet<Images> Images { get; set; }
+        public virtual DbSet<Emoji> Emojis { get; set; }
 
         protected override void OnModelCreating(ModelBuilder builder)
         {
             base.OnModelCreating(builder);
+            // AppUser and UserProfile
+            builder.Entity<AppUser>()
+                .HasOne(a => a.UserProfile)
+                .WithOne(up => up.AppUser)
+                .HasForeignKey<AppUser>(up => up.Id)
+                .OnDelete(DeleteBehavior.Cascade);
+
             // Cấu hình ràng buộc duy nhất cho trường Email
             builder.Entity<AppUser>()
                 .HasIndex(u => u.Email)
@@ -140,6 +148,13 @@ namespace api.Data
                 .HasOne(ubi => ubi.BookItem)
                 .WithMany(b => b.UserBooks)
                 .HasForeignKey(ubi => ubi.BookItemId);
+
+             // Thiết lập quan hệ mot nhieu giữa AppUser và BookItemBase
+            builder.Entity<BookItemBase>()
+                .HasOne(u => u.AppUser)
+                .WithMany(u => u.BookItems)
+                .HasForeignKey(ubi => ubi.OwnerId)
+                .OnDelete(DeleteBehavior.Restrict);
 
             List<IdentityRole> roles = new List<IdentityRole>
             {

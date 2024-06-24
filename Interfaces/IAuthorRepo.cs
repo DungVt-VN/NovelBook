@@ -10,5 +10,7 @@ namespace api.Interfaces
     {
         Task<String?> GetAuthorByIdAsync(int bookId);
         Task<List<Author>> GetAllAuthorsAsync();
+        Task<int> UpdateNewAuthorAsync(string authors);
+        Task<int?> GetAuthorByNameAsync(string author);
     }
 }

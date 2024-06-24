@@ -77,10 +77,11 @@ namespace api.Controllers
             }
 
             // Xóa mã khỏi cache sau khi sử dụng
-            if(user.Email != null ){
+            if (user.Email != null)
+            {
                 _cache.Remove(user.Email);
             }
-            
+
 
             return Ok("Đặt lại mật khẩu thành công.");
         }

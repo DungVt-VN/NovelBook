@@ -9,5 +9,7 @@ namespace api.Models
         public UserProfile? UserProfile { get; set; }
         public ICollection<Comment> Comments { get; set; } = new List<Comment>();
         public ICollection<UserBook> UserBooks { get; set; } = new List<UserBook>();
+        public IList<string>? Roles { get; internal set; }
+        public IList<BookItemBase> BookItems { get; internal set; } = new List<BookItemBase>();
     }
 }
