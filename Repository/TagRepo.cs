@@ -19,6 +19,12 @@ namespace api.Repository
             _context = context;
         }
 
+        public async Task<IEnumerable<Models.Tag>> GetAllTagsAsync()
+        {
+            var tags = await _context.Tags.ToListAsync();
+            return tags;
+        }
+
         public async Task<ICollection<string>> GetTagByIdAsync(int bookId)
         {
             var tagIds = await _context.BookTags
@@ -31,7 +37,7 @@ namespace api.Repository
             return result.Select(c => c.TagName).ToList();
         }
 
-        public async Task<string?> UpdateTagAsync(int[]? tags, int bookId)
+        public async Task<string?> UpdateTagAsync(string[]? tags, int bookId)
         {
             var book = await _context.BookItems.FindAsync(bookId);
             if (book == null)
@@ -41,17 +47,20 @@ namespace api.Repository
             try
             {
                 var result = await _context.BookTags.Where(c => c.BookId == bookId).ToListAsync();
-
                 _context.BookTags.RemoveRange(result);
                 if (tags != null)
                 {
                     foreach (var item in tags)
                     {
-                        _context.BookTags.Add(new BookTag()
+                        var tag = await _context.Tags.FirstOrDefaultAsync(c => c.TagName == item);
+                        if (tag != null)
                         {
-                            BookId = bookId,
-                            TagId = item
-                        });
+                            _context.BookTags.Add(new BookTag()
+                            {
+                                BookId = bookId,
+                                TagId = tag.TagId
+                            });
+                        }
                     }
                 }
 

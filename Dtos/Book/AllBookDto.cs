@@ -14,6 +14,7 @@ namespace api.Dtos.Book
         public string NameUrl { get; set; } = string.Empty;
         public string OwnerId { get; set; } = string.Empty;
         public string CoverImage { get; set; } = string.Empty;
+        public Boolean Actived { get; set; } =false;
         public BookStatusEnum Status { get; set; }
         public int CurrentChapter { get; set; }
         public string Description { get; set; } = string.Empty;
@@ -25,6 +26,8 @@ namespace api.Dtos.Book
         public int Followed { get; set; }
         public int Commented { get; set; }
         public ICollection<String>? Categories { get; set; }    
+        public ICollection<String>? Tags { get; set; }
+        public ICollection<String>? AnotherNames { get; set; }
     }
     
 }

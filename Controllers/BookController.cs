@@ -52,8 +52,10 @@ namespace api.Controllers
                 var commentCount = await _commentRepo.GetCountCommentOfBook(book.BookId);
 
                 var categories = await _categoryRepo.GetCategoryByIdAsync(book.BookId);
+                var tags = await _tagRepo.GetTagByIdAsync(book.BookId);
+                var anotherNames = await _anotherNameRepo.GetAnotherNameByIdAsync(book.BookId);
 
-                var bookWithAuthor = book.ToViewAllBook(pseudonym, commentCount, categories);
+                var bookWithAuthor = book.ToViewAllBook(pseudonym, commentCount, categories, tags, anotherNames);
                 allBook.Add(bookWithAuthor);
             }
 
@@ -101,6 +103,7 @@ namespace api.Controllers
                 var (messageBook, idNewBook) = await _bookItemRepo.UpdateBookAsync(editBook);
                 var messageCategory = await _categoryRepo.UpdateCategoryAsync(categories, idNewBook);
                 var messageTag = await _tagRepo.UpdateTagAsync(tags, idNewBook);
+                var messageAnotherName = await _anotherNameRepo.UpdateAnotherNameAsync(editBookDto.AnotherNames, idNewBook);
                 if (messageCategory == null || messageTag == null || messageBook == null)
                 {
                     return BadRequest(messageBook + messageCategory + messageTag);
@@ -111,6 +114,19 @@ namespace api.Controllers
                 return BadRequest("Dữ liệu không hợp lệ.");
             }
             return Ok("Update Success!!!");
+        }
+
+        [HttpGet("category")]
+        public async Task<IActionResult> GetAllCategoryAsync()
+        {
+            var categories = await _categoryRepo.GetAllCategoryAsync();
+            return Ok(categories);
+        }
+        [HttpGet("tags")]
+        public async Task<IActionResult> GetAllTagsAsync()
+        {
+            var tags = await _tagRepo.GetAllTagsAsync();
+            return Ok(tags);
         }
     }
 }

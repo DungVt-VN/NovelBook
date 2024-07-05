@@ -11,7 +11,7 @@ namespace api.Mappers
 {
     public static class ViewAllBook
     {
-        public static AllBookDto ToViewAllBook(this BookItemBase bookItemBase, string pseudonym, int commentCount, ICollection<String> categories)
+        public static AllBookDto ToViewAllBook(this BookItemBase bookItemBase, string pseudonym, int commentCount, ICollection<String> categories, ICollection<string> tags, ICollection<string>? anotherNames)
         {
             return new AllBookDto
             {
@@ -30,7 +30,10 @@ namespace api.Mappers
                 Viewed = bookItemBase.Viewed,
                 Followed = bookItemBase.Followed,
                 Commented = commentCount,
-                Categories = categories
+                Categories = categories,
+                Tags = tags,
+                AnotherNames = anotherNames,
+                Actived = bookItemBase.Actived
             };
         }
 
@@ -59,7 +62,7 @@ namespace api.Mappers
             };
         }
 
-        public static (BookItemBase BookItem, int[]? Categories, int[]? Tags, string? Author)? ToEditBook(this EditBookDto editBookDto)
+        public static (BookItemBase BookItem, string[]? Categories, string[]? Tags, string? Author)? ToEditBook(this EditBookDto editBookDto)
         {
             if (editBookDto != null)
             {
@@ -78,7 +81,23 @@ namespace api.Mappers
             return null;
         }
 
-
-
+        public static (Chapter chapter, List<Images> images)? FromCreateChapter(this CreateChapterDto createChapterDto)
+        {
+            if (createChapterDto != null)
+            {
+                var chapter = new Chapter
+                {
+                    ChapterId = createChapterDto.ChapterId,
+                    Title = createChapterDto.Title,
+                    MangaId = createChapterDto.MangaId,
+                    ChapterNumber = createChapterDto.ChapterNumber,
+                    Content = createChapterDto.Content ?? "",
+                    PublishedDate = createChapterDto.PublishedDate,
+                    viewed = createChapterDto.Viewed,
+                };
+                return (chapter, createChapterDto.Images);
+            }
+            return null;
+        }
     }
 }

@@ -153,6 +153,7 @@ builder.Services.AddTransient<IEmailService, EmailService>();
 builder.Services.AddScoped<IUserRepo, UserRepo>();
 builder.Services.AddScoped<ITagRepo, TagRepo>();
 builder.Services.AddScoped<IAnotherNameRepo, AnotherNameRepo>();
+builder.Services.AddScoped<IChapterRepo, ChapterRepo>();
 
 
 var app = builder.Build();

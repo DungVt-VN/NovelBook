@@ -8,6 +8,7 @@ namespace api.Interfaces
     {
         Task<ICollection<String>> GetCategoryByIdAsync(int bookId);
         Task<Category?> GetCategoryAsync(int categoryId);
-        Task<string?> UpdateCategoryAsync(int[]? categoryIds, int bookId);
+        Task<string?> UpdateCategoryAsync(string[]? categoryIds, int bookId);
+        Task<IEnumerable<Category>> GetAllCategoryAsync();
     }
 }

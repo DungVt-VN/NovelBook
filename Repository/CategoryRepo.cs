@@ -16,6 +16,11 @@ namespace api.Repository
         {
             _context = context;
         }
+        public async Task<IEnumerable<Category>> GetAllCategoryAsync()
+        {
+            var categories = await _context.Categories.ToListAsync();
+            return categories;
+        }
 
         public async Task<Category?> GetCategoryAsync(int categoryId)
         {
@@ -34,7 +39,7 @@ namespace api.Repository
             return result.Select(c => c.CategoryName).ToList();
         }
 
-        public async Task<string?> UpdateCategoryAsync(int[]? categoryIds, int bookId)
+        public async Task<string?> UpdateCategoryAsync(string[]? categories, int bookId)
         {
             var book = await _context.BookItems.FindAsync(bookId);
             if (book == null)
@@ -45,15 +50,19 @@ namespace api.Repository
             {
                 _context.BookCategories.RemoveRange(_context.BookCategories.Where(c => c.BookId == bookId));
                 await _context.SaveChangesAsync();
-                if (categoryIds != null)
+                if (categories != null)
                 {
-                    foreach (var categoryId in categoryIds)
+                    foreach (var item in categories)
                     {
-                        _context.BookCategories.Add(new BookCategory
+                        var categoryId = await _context.Categories.FirstOrDefaultAsync(c => c.CategoryName == item);
+                        if (categoryId != null)
                         {
-                            BookId = bookId,
-                            CategoryId = categoryId
-                        });
+                            _context.BookCategories.Add(new BookCategory
+                            {
+                                BookId = bookId,
+                                CategoryId = categoryId.CategoryId
+                            });
+                        }
                     }
                     await _context.SaveChangesAsync();
                 }
