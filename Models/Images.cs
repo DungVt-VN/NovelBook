@@ -11,7 +11,7 @@ namespace api.Models
         public int ImageId { get; set; }
 
         [Required, Url]
-        public string Url { get; set; } = string.Empty;
+        public string ImageUrl { get; set; } = string.Empty;
 
         [Required]
         public int NumericalOrder { get; set; } = 0;
@@ -20,6 +20,6 @@ namespace api.Models
         public int ChapterId { get; set; }
 
         [ForeignKey("ChapterId")]
-        public Chapter? Chapter { get; set; }
+        public MangaChapter Chapter { get; set; } = new MangaChapter();
     }
 }

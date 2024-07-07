@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using api.Data;
+using api.Dtos.Account;
 using api.Dtos.User;
 using api.Interfaces;
 using api.Models;
@@ -17,11 +18,22 @@ namespace api.Repository
         private readonly ApplicationDBContext _context;
         private readonly UserManager<AppUser> _userManager;
         private readonly RoleManager<IdentityRole> _roleManager;
-        public UserRepo(ApplicationDBContext context, UserManager<AppUser> userManager, RoleManager<IdentityRole> roleManager)
+        private readonly SignInManager<AppUser> _signInManager;
+        private readonly ITokenService _tokenService;
+        private readonly IUserProfileRepo _userProfileRepo;
+        public UserRepo(ApplicationDBContext context,
+                    UserManager<AppUser> userManager,
+                    RoleManager<IdentityRole> roleManager,
+                    SignInManager<AppUser> signInManager,
+                    IUserProfileRepo userProfileRepo,
+                    ITokenService tokenService)
         {
             _context = context;
             _roleManager = roleManager;
             _userManager = userManager;
+            _signInManager = signInManager;
+            _tokenService = tokenService;
+            _userProfileRepo = userProfileRepo;
         }
 
         public async Task<string> ConfirmEmailAsync(string email)
@@ -93,6 +105,81 @@ namespace api.Repository
             return true;
         }
 
+        public async Task<NewUserDto?> LoginAsync(LoginDto loginDto)
+        {
+            var user = await _userManager.Users.FirstOrDefaultAsync(x => x.Email == loginDto.Email.ToLower());
+
+            if (user == null) return null;
+
+            var result = await _signInManager.CheckPasswordSignInAsync(user, loginDto.Password, false);
+
+            if (!result.Succeeded) return null;
+            return new NewUserDto
+            {
+                UserName = user.UserName,
+                Email = user.Email,
+                Token = await _tokenService.CreateToken(user)
+            };
+        }
+
+        public async Task<NewUserDto?> RegisterAsync(RegisterDto registerDto)
+        {
+            var useremail = await _userManager.Users.FirstOrDefaultAsync(x => x.NormalizedEmail == registerDto.Email.ToUpper());
+            var username = await _userManager.Users.FirstOrDefaultAsync(x => x.NormalizedUserName == registerDto.Username.ToUpper());
+            if (useremail == null || username == null)
+            {
+                return null;
+            }
+            try
+            {
+                var appUser = new AppUser
+                {
+                    UserName = registerDto.Username,
+                    Email = registerDto.Email,
+                };
+                var userProfile = new UserProfile
+                {
+                    FirstName = registerDto.FirstName,
+                    LastName = registerDto.LastName,
+                    DateOfBirth = registerDto.DateOfBirth,
+                    Gender = registerDto.Gender,
+                    UserId = appUser.Id,
+                    AppUser = appUser
+                };
+
+                var createdUser = await _userManager.CreateAsync(appUser, registerDto.Password);
+
+                if (createdUser.Succeeded)
+                {
+                    var roleResult = await _userManager.AddToRoleAsync(appUser, "User");
+                    if (roleResult.Succeeded)
+                    {
+                        await _userProfileRepo.CreateAsync(userProfile);
+                        return (
+                            new NewUserDto
+                            {
+                                UserName = appUser.UserName,
+                                Email = appUser.Email,
+                                Token = await _tokenService.CreateToken(appUser)
+                            }
+                        );
+                    }
+                    else
+                    {
+                        return null;
+                    }
+                }
+                else
+                {
+                    return null;
+                }
+            }
+            catch
+            {
+                return null;
+            }
+        }
+
         public async Task<string> UpdateUserAsync(UpdateUserDto updateUserDto)
         {
             // Tìm người dùng theo Id
@@ -121,9 +208,9 @@ namespace api.Repository
 
             await _userManager.RemoveFromRolesAsync(user, rolesToRemove);
             await _userManager.AddToRolesAsync(user, rolesToAdd);
-            if (updateUserDto.EmailConfirmed != 0)
+            if (updateUserDto.LockoutEndDate != 0)
             {
-                DateTimeOffset lockoutEndDate = DateTimeOffset.UtcNow.AddDays(updateUserDto.EmailConfirmed);
+                DateTimeOffset lockoutEndDate = DateTimeOffset.UtcNow.AddDays(updateUserDto.LockoutEndDate);
                 await _userManager.SetLockoutEndDateAsync(user, lockoutEndDate);
             }
             return "Update Successfully";

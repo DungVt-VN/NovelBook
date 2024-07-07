@@ -23,23 +23,17 @@ namespace api.Controllers
     [ApiController]
     public class AccountController : ControllerBase
     {
-        private readonly UserManager<AppUser> _userManager;
         private readonly ITokenService _tokenService;
-        private readonly SignInManager<AppUser> _signInManager;
-        private readonly IUserProfileRepo _userProfileRepo;
+        private readonly IUserRepo _userRepo;
 
 
         public AccountController(
-            UserManager<AppUser> userManager,
             ITokenService tokenService,
-            SignInManager<AppUser> signInManager,
-            IUserProfileRepo userProfileRepo,
-            IEmailService emailService)
+            IUserRepo userRepo
+            )
         {
-            _userManager = userManager;
             _tokenService = tokenService;
-            _signInManager = signInManager;
-            _userProfileRepo = userProfileRepo;
+            _userRepo = userRepo;
         }
 
         // Login
@@ -49,23 +43,12 @@ namespace api.Controllers
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
-
-            var user = await _userManager.Users.FirstOrDefaultAsync(x => x.Email == loginDto.Email.ToLower());
-
-            if (user == null) return Unauthorized("Invalid username");
-
-            var result = await _signInManager.CheckPasswordSignInAsync(user, loginDto.Password, false);
-
-            if (!result.Succeeded) return Unauthorized("Password incorrect");
-
-            return Ok(
-                new NewUserDto
-                {
-                    UserName = user.UserName,
-                    Email = user.Email,
-                    Token = await _tokenService.CreateToken(user)
-                }
-            );
+            var result = await _userRepo.LoginAsync(loginDto);
+            if (result == null)
+            {
+                return Unauthorized("Email or Password incorrect!");
+            }
+            return Ok(result);
         }
 
         // Register
@@ -73,60 +56,17 @@ namespace api.Controllers
         [HttpPost("register")]
         public async Task<IActionResult> Register([FromBody] RegisterDto registerDto)
         {
-            try
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+            if (string.IsNullOrEmpty(registerDto.Password))
+                return BadRequest("Password is required");
+            var result = await _userRepo.RegisterAsync(registerDto);
+            if (result == null)
             {
-                if (!ModelState.IsValid)
-                    return BadRequest(ModelState);
-
-                if (string.IsNullOrEmpty(registerDto.Password))
-                    return BadRequest("Password is required");
-
-                var appUser = new AppUser
-                {
-                    UserName = registerDto.Username,
-                    Email = registerDto.Email,
-                };
-                var userProfile = new UserProfile
-                {
-                    FirstName = registerDto.FirstName,
-                    LastName = registerDto.LastName,
-                    DateOfBirth = registerDto.DateOfBirth,
-                    Gender = registerDto.Gender,
-                    AppUserId = appUser.Id,
-                    AppUser = appUser
-                };
-
-                var createdUser = await _userManager.CreateAsync(appUser, registerDto.Password);
-
-                if (createdUser.Succeeded)
-                {
-                    var roleResult = await _userManager.AddToRoleAsync(appUser, "User");
-                    if (roleResult.Succeeded)
-                    {
-                        await _userProfileRepo.CreateAsync(userProfile);
-                        return Ok(
-                            new NewUserDto
-                            {
-                                UserName = appUser.UserName,
-                                Email = appUser.Email,
-                                Token = await _tokenService.CreateToken(appUser)
-                            }
-                        );
-                    }
-                    else
-                    {
-                        return StatusCode(500, roleResult.Errors);
-                    }
-                }
-                else
-                {
-                    return StatusCode(500, createdUser.Errors);
-                }
+                return BadRequest("Email or Username already exists!");
             }
-            catch (Exception e)
-            {
-                return StatusCode(500, e);
-            }
+            return Ok(result);
+
         }
 
         // Logout
@@ -147,7 +87,7 @@ namespace api.Controllers
             }
         }
 
-        
+
 
         // --------------------------------------------------------------------------------------------------------------------
 

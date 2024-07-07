@@ -22,20 +22,20 @@ namespace api.Repository
             _context = context;
         }
 
-        public async Task<ICollection<BookItemBase>> GetAllAsync()
+        public async Task<ICollection<BookItem>> GetAllAsync(QueryObject queryObject)
         {
-            var books = await _context.BookItems.ToListAsync();
-            return books;
+            var skipNumber = (queryObject.PageNumber - 1)*queryObject.PageSize;
+            return await _context.BookItems.Skip(skipNumber).Take(queryObject.PageSize).ToListAsync();
         }
 
-        public async Task<List<BookItemBase>> GetAllBooksWithAuthorsAsync()
+        public async Task<List<BookItem>> GetAllBooksWithAuthorsAsync()
         {
             return await _context.BookItems
                 .Include(b => b.Author) // Eager loading to include Author data
                 .ToListAsync();
         }
 
-        public async Task<List<BookItemBase>> GetAllBooksWithAuthorsAndCategoriesAsync()
+        public async Task<List<BookItem>> GetAllBooksWithAuthorsAndCategoriesAsync()
         {
             return await _context.BookItems
                 .Include(b => b.Author)
@@ -43,26 +43,28 @@ namespace api.Repository
                     .ThenInclude(bc => bc.Category)
                 .ToListAsync();
         }
-        public async Task<List<BookItemBase>> GetBooksQueryAsync(QueryObject queryObject)
+        public async Task<List<BookItem>> GetBooksQueryAsync(QueryObject queryObject)
         {
             var bookItem = _context.BookItems.AsQueryable();
 
             if (queryObject.NewChapter)
             {
-                // Sắp xếp sách theo chương mới nhất
-#pragma warning disable CS8602 // Dereference of a possibly null reference.
                 bookItem = bookItem
                     .GroupJoin(
-                        _context.Chapters,
-                        book => book.BookId,
-                        chapter => chapter.MangaId,
-                        (book, chapters) => new { Book = book, Chapters = chapters })
+                        _context.Chapters, // Thực hiện group join với bảng Chapters trong DbContext (_context)
+                        book => book.BookId, // Khóa chính của bảng sách (bookItem)
+                        chapter => chapter.BookItemId, // Khóa ngoại trỏ đến sách trong bảng Chapters
+                        (book, chapters) => new { Book = book, Chapters = chapters }) // Kết quả trả về là một object có thuộc tính Book và Chapters
                     .SelectMany(
-                        bc => bc.Chapters.DefaultIfEmpty(),
-                        (bc, chapter) => new { bc.Book, LatestChapterDate = chapter.PublishedDate })
-                    .OrderByDescending(bc => bc.LatestChapterDate)
-                    .Select(bc => bc.Book);
-#pragma warning restore CS8602 // Dereference of a possibly null reference.
+                        bc => bc.Chapters.DefaultIfEmpty(), // SelectMany để kết hợp các sách với chương tương ứng, mặc định nếu không có chương
+                        (bc, chapter) => new
+                        {
+                            bc.Book,
+                            LatestChapterDate = (chapter != null) ? chapter.PublishedDate : (DateTime?)null
+                        }) // Lấy sách và ngày phát hành chương mới nhất
+                    .OrderByDescending(bc => bc.LatestChapterDate) // Sắp xếp giảm dần theo ngày phát hành chương mới nhất
+                    .Select(bc => bc.Book); // Chọn ra các sách đã được sắp xếp theo chương mới nhất
+
             }
 
             if (queryObject.MostChapter)
@@ -117,7 +119,7 @@ namespace api.Repository
                 .Join(
                     _context.Chapters.Where(c => c.ChapterNumber == 1),
                     book => book.BookId,
-                    chapter => chapter.MangaId,
+                    chapter => chapter.BookItemId,
                     (book, chapter) => new { Book = book, Chapter = chapter }
                 )
                 .OrderByDescending(bc => bc.Chapter.PublishedDate)
@@ -132,7 +134,7 @@ namespace api.Repository
             return await bookItem.ToListAsync();
         }
 
-        public async Task<BookItemBase?> GetBookByIdAsync(string id)
+        public async Task<BookItem?> GetBookByIdAsync(string id)
         {
             bool isNumber = int.TryParse(id, out int number);
             if (isNumber)
@@ -157,12 +159,12 @@ namespace api.Repository
 
         }
 
-        public async Task<(string?, int)> UpdateBookAsync(BookItemBase bookItem)
+        public async Task<(string?, int)> UpdateBookAsync(BookItem bookItem)
         {
             var book = await _context.BookItems.FirstOrDefaultAsync(b => b.BookId == bookItem.BookId);
             if (book == null)
             {
-                var newBook = new BookItemBase
+                var newBook = new BookItem
                 {
                     Name = bookItem.Name ?? string.Empty,
                     Actived = bookItem.Actived,

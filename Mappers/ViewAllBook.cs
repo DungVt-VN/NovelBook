@@ -11,7 +11,7 @@ namespace api.Mappers
 {
     public static class ViewAllBook
     {
-        public static AllBookDto ToViewAllBook(this BookItemBase bookItemBase, string pseudonym, int commentCount, ICollection<String> categories, ICollection<string> tags, ICollection<string>? anotherNames)
+        public static AllBookDto ToViewAllBook(this BookItem bookItemBase, string pseudonym, int commentCount, ICollection<String> categories, ICollection<string> tags, ICollection<string>? anotherNames)
         {
             return new AllBookDto
             {
@@ -37,7 +37,7 @@ namespace api.Mappers
             };
         }
 
-        public static DetailBookDto ToViewDetailBook(this BookItemBase bookItemBase, string pseudonym, int commentCount, ICollection<String> categories, ICollection<String> tags, ICollection<String>? anotherNames)
+        public static DetailBookDto ToViewDetailBook(this BookItem bookItemBase, string pseudonym, int commentCount, ICollection<String> categories, ICollection<String> tags, ICollection<String>? anotherNames)
         {
             return new DetailBookDto
             {
@@ -62,11 +62,11 @@ namespace api.Mappers
             };
         }
 
-        public static (BookItemBase BookItem, string[]? Categories, string[]? Tags, string? Author)? ToEditBook(this EditBookDto editBookDto)
+        public static (BookItem BookItem, string[]? Categories, string[]? Tags, string? Author)? ToEditBook(this EditBookDto editBookDto)
         {
             if (editBookDto != null)
             {
-                var bookItemBase = new BookItemBase
+                var bookItemBase = new BookItem
                 {
                     BookId = editBookDto.BookId,
                     Name = editBookDto.Name,
@@ -81,19 +81,19 @@ namespace api.Mappers
             return null;
         }
 
-        public static (Chapter chapter, List<Images> images)? FromCreateChapter(this CreateChapterDto createChapterDto)
+        public static (ChapterBase chapter, List<Images> images)? FromCreateChapter(this CreateChapterDto createChapterDto)
         {
             if (createChapterDto != null)
             {
-                var chapter = new Chapter
+                var chapter = new ChapterBase
                 {
                     ChapterId = createChapterDto.ChapterId,
                     Title = createChapterDto.Title,
-                    MangaId = createChapterDto.MangaId,
+                    BookItemId = createChapterDto.BookItemId,
                     ChapterNumber = createChapterDto.ChapterNumber,
                     Content = createChapterDto.Content ?? "",
                     PublishedDate = createChapterDto.PublishedDate,
-                    viewed = createChapterDto.Viewed,
+                    Viewed = createChapterDto.Viewed,
                 };
                 return (chapter, createChapterDto.Images);
             }

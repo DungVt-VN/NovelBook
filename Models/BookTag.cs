@@ -15,6 +15,6 @@ namespace api.Models
         public Tag? Tag { get; set; }
 
         [ForeignKey("BookId")]
-        public BookItemBase? BookItem { get; set; }
+        public BookItem? BookItem { get; set; }
     }
 }

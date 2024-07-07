@@ -16,6 +16,18 @@ namespace api.Repository
         {
             _context = context;
         }
+
+        public async Task<string?> DeleteCategoryAsync(int categoryId)
+        {
+            var category = await _context.Categories.FindAsync(categoryId);
+            if (category != null)
+            {
+                _context.Categories.Remove(category);
+                await _context.SaveChangesAsync();
+            }
+            return "Delete Sussessful!";
+        }
+
         public async Task<IEnumerable<Category>> GetAllCategoryAsync()
         {
             var categories = await _context.Categories.ToListAsync();
@@ -39,7 +51,24 @@ namespace api.Repository
             return result.Select(c => c.CategoryName).ToList();
         }
 
-        public async Task<string?> UpdateCategoryAsync(string[]? categories, int bookId)
+        public async Task<string?> InsertCategoryAsync(List<Category> categories)
+        {
+            var existingCategoryNames = await _context.Categories.Select(c => c.CategoryName).ToListAsync();
+            var newCategories = categories
+                .Where(c => !existingCategoryNames.Contains(c.CategoryName, StringComparer.OrdinalIgnoreCase))
+                .ToList();
+
+            if (!newCategories.Any())
+            {
+                return "No new categories to insert.";
+            }
+
+            await _context.Categories.AddRangeAsync(newCategories);
+            return await _context.SaveChangesAsync() > 0 ? "Insert Successful!" : null;
+        }
+
+
+        public async Task<string?> UpdateBookCategoryAsync(string[]? categories, int bookId)
         {
             var book = await _context.BookItems.FindAsync(bookId);
             if (book == null)
@@ -72,6 +101,20 @@ namespace api.Repository
             {
                 return null;
             }
+        }
+
+        public async Task<string?> UpdateCategoryAsync(Category category)
+        {
+            var existingCategory = await _context.Categories.FindAsync(category.CategoryId);
+
+            if (existingCategory == null)
+            {
+                return "Category not found"; // Trả về thông báo lỗi nếu thực thể không tồn tại.
+            }
+
+            _context.Categories.Update(category);
+
+            return await _context.SaveChangesAsync() > 0 ? "Update Successful!" : "No changes were made.";
         }
 
     }

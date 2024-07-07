@@ -38,10 +38,12 @@ namespace api.Controllers
             _tagRepo = tagRepo;
         }
 
-        [HttpGet]
-        public async Task<IActionResult> GetAllBookAsync()
+        [HttpGet("page/{id}")]
+        public async Task<IActionResult> GetAllBookAsync([FromRoute] int id = 0)
         {
-            var books = await _bookItemRepo.GetAllAsync();
+            var queryObject = new QueryObject();
+            queryObject.PageNumber = id;
+            var books = await _bookItemRepo.GetAllAsync(queryObject);
             var allBook = new List<AllBookDto>();
 
             foreach (var book in books)
@@ -101,8 +103,8 @@ namespace api.Controllers
                 }
                 editBook.AuthorId = (int)authorId;
                 var (messageBook, idNewBook) = await _bookItemRepo.UpdateBookAsync(editBook);
-                var messageCategory = await _categoryRepo.UpdateCategoryAsync(categories, idNewBook);
-                var messageTag = await _tagRepo.UpdateTagAsync(tags, idNewBook);
+                var messageCategory = await _categoryRepo.UpdateBookCategoryAsync(categories, idNewBook);
+                var messageTag = await _tagRepo.UpdateBookTagAsync(tags, idNewBook);
                 var messageAnotherName = await _anotherNameRepo.UpdateAnotherNameAsync(editBookDto.AnotherNames, idNewBook);
                 if (messageCategory == null || messageTag == null || messageBook == null)
                 {
@@ -116,17 +118,51 @@ namespace api.Controllers
             return Ok("Update Success!!!");
         }
 
-        [HttpGet("category")]
+        [HttpGet("categories")]
         public async Task<IActionResult> GetAllCategoryAsync()
         {
             var categories = await _categoryRepo.GetAllCategoryAsync();
             return Ok(categories);
         }
+
         [HttpGet("tags")]
         public async Task<IActionResult> GetAllTagsAsync()
         {
             var tags = await _tagRepo.GetAllTagsAsync();
             return Ok(tags);
         }
+
+        [HttpPost("categories")]
+        public async Task<IActionResult> AddCategoriesAsync([FromBody] List<string> categories)
+        {
+            if (categories == null || categories.Count == 0)
+            {
+                return BadRequest("Danh sách thể loại trống.");
+            }
+            var toCategories = categories.Select(categoryName => new Category { CategoryName = categoryName }).ToList();
+            var message = await _categoryRepo.InsertCategoryAsync(toCategories);
+            if (message == null)
+            {
+                return BadRequest("Thêm thể loại thất bại.");
+            }
+            return Ok(message);
+        }
+
+        [HttpPost("tags")]
+        public async Task<IActionResult> AddTagsAsync([FromBody] List<string> tags)
+        {
+            if (tags == null || tags.Count == 0)
+            {
+                return BadRequest("Danh sách tag trống.");
+            }
+            var toTags = tags.Select(tagName => new Tag { TagName = tagName }).ToList();
+            var message = await _tagRepo.InsertTagAsync(toTags);
+            if (message == null)
+            {
+                return BadRequest("Thêm thể loại thất bại.");
+            }
+            return Ok(message);
+        }
+
     }
 }

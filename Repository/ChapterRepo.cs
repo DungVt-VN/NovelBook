@@ -16,23 +16,23 @@ namespace api.Repository
         {
             _context = context;
         }
-        public async Task<ICollection<Chapter>> GetAllChapterByIdAsync(int bookId)
+        public async Task<ICollection<ChapterBase>> GetAllChapterByIdAsync(int bookId)
         {
-            var chapter = await _context.Chapters.Where(c => c.MangaId == bookId).ToListAsync();
+            var chapter = await _context.Chapters.Where(c => c.BookItemId == bookId).ToListAsync();
             return chapter;
         }
 
-        public async Task<int?> CreateChapterAsync(Chapter chapter)
+        public async Task<int?> CreateChapterAsync(ChapterBase chapter)
         {
             try
             {
-                var book = await _context.BookItems.FirstOrDefaultAsync(c => c.BookId == chapter.MangaId);
+                var book = await _context.BookItems.FirstOrDefaultAsync(c => c.BookId == chapter.BookItemId);
                 if (book == null)
                 {
                     return null;
                 }
                 var chapters = await _context.Chapters
-                    .Where(c => c.MangaId == chapter.MangaId)
+                    .Where(c => c.BookItemId == chapter.BookItemId)
                     .Select(c => c.ChapterNumber)
                     .ToListAsync();
 
@@ -86,14 +86,14 @@ namespace api.Repository
             var images = await _context.Images
                 .Where(i => i.ChapterId == chapterId)
                 .OrderBy(i => i.NumericalOrder)
-                .Select(i => i.Url)
+                .Select(i => i.ImageUrl)
                 .ToListAsync();
 
             return images;
         }
 
 
-        public async Task<int?> EditChapterAsync(Chapter chapter)
+        public async Task<int?> EditChapterAsync(ChapterBase chapter)
         {
             var result = await _context.Chapters.FirstOrDefaultAsync(c => c.ChapterId == chapter.ChapterId);
             if (result == null)

@@ -8,12 +8,18 @@ namespace api.Models
         [Key]
         public int AnotherNameId { get; set; }
 
-        public string? Name { get; set; }
+        [MaxLength(1000, ErrorMessage = "Name cannot exceed 1000 characters")]
+        public string Name { get; set; } = string.Empty;
 
-        [Required]
+        [Required(ErrorMessage = "BookId is required")]
         public int BookId { get; set; }
 
         [ForeignKey("BookId")]
-        public BookItemBase? BookItemBase { get; set; }
+        public BookItem? BookItem { get; set; }
+
+        public static implicit operator string(AnotherName v)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

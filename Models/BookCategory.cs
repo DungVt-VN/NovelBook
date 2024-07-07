@@ -6,15 +6,18 @@ namespace api.Models
     public class BookCategory
     {
         [Key]
-        public int CategoryId { get; set; }
+        public int BookCategoryId { get; set; }
 
         [Required]
         public int BookId { get; set; }
 
+        [ForeignKey("BookId")]
+        public BookItem? BookItem { get; set; }
+
+        [Required]
+        public int CategoryId { get; set; }
+
         [ForeignKey("CategoryId")]
         public Category? Category { get; set; }
-
-        [ForeignKey("BookId")]
-        public BookItemBase? BookItem { get; set; }
     }
 }

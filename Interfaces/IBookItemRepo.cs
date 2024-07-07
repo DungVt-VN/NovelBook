@@ -11,13 +11,13 @@ namespace api.Interfaces
 {
     public interface IBookItemRepo
     {
-        Task<ICollection<BookItemBase>> GetAllAsync();
-        Task<List<BookItemBase>> GetAllBooksWithAuthorsAndCategoriesAsync();
-        Task<List<BookItemBase>> GetAllBooksWithAuthorsAsync();
+        Task<ICollection<BookItem>> GetAllAsync(QueryObject queryObject);
+        Task<List<BookItem>> GetAllBooksWithAuthorsAndCategoriesAsync();
+        Task<List<BookItem>> GetAllBooksWithAuthorsAsync();
 
-        Task<List<BookItemBase>> GetBooksQueryAsync(QueryObject queryObject);
-        Task<BookItemBase?> GetBookByIdAsync(string id);
-        Task<(string?, int)> UpdateBookAsync(BookItemBase bookItem);
+        Task<List<BookItem>> GetBooksQueryAsync(QueryObject queryObject);
+        Task<BookItem?> GetBookByIdAsync(string id);
+        Task<(string?, int)> UpdateBookAsync(BookItem bookItem);
 
     }
 }

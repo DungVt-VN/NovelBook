@@ -18,11 +18,11 @@ namespace api.Models
         public int BookItemId { get; set; }
 
         [ForeignKey("BookItemId")]
-        public BookItemBase? BookItem { get; set; }
+        public BookItem? BookItem { get; set; }
 
         public bool Liked { get; set; } = false;
         public bool Followed { get; set; } = false;
-        public int Rating { get; set; } = 5;
+        public int Rating { get; set; } = 0;
         public int Viewed { get; set; } = 0;
     }
 }

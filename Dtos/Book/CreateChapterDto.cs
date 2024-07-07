@@ -15,6 +15,6 @@ namespace api.Dtos.Book
         public DateTime PublishedDate { get; set; }
         public int Viewed { get; set; }
         public List<Images> Images { get; set; } = new List<Images>();
-        public int MangaId { get; set; }
+        public int BookItemId { get; set; }
     }
 }

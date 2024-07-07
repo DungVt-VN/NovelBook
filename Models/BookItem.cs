@@ -6,7 +6,7 @@ using api.Data.Enums;
 
 namespace api.Models
 {
-    public class BookItemBase
+    public class BookItem
     {
         [Key]
         public int BookId { get; set; }
@@ -23,6 +23,7 @@ namespace api.Models
                 NameUrl = _name.ToLower().Replace(" ", "-");
             }
         }
+        
         public string NameUrl { get; set; } = string.Empty;
         public Boolean Actived { get; set; } = false;
         public string CoverImage { get; set; } = string.Empty;
@@ -37,9 +38,12 @@ namespace api.Models
 
         [ForeignKey("AuthorId")]
         public Author? Author { get; set; }
-        public string OwnerId { get; set; }
+
+        [Required]
+        public string OwnerId { get; set; } = string.Empty;
+
         [ForeignKey("OwnerId")]
-        public AppUser AppUser { get; set; }
+        public AppUser? AppUser { get; set; }
 
         public int Voted { get; set; } = 0;
         public int Rating { get; set; } = 5;
@@ -54,20 +58,19 @@ namespace api.Models
         public ICollection<AnotherName> AnotherNames { get; set; } = new List<AnotherName>();
         public ICollection<Comment> Comments { get; set; } = new List<Comment>();
         public ICollection<UserBook> UserBooks { get; set; } = new List<UserBook>();
+        public ICollection<ChapterBase> ChapterList { get; set; } = new List<ChapterBase>();
 
-        // Constructor mặc định
-#pragma warning disable CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider adding the 'required' modifier or declaring as nullable.
-        public BookItemBase()
-#pragma warning restore CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider adding the 'required' modifier or declaring as nullable.
+
+        // Default constructor
+        public BookItem()
         {
+            _name = string.Empty;
         }
 
-        // Constructor với tham số name
-#pragma warning disable CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider adding the 'required' modifier or declaring as nullable.
-        public BookItemBase(string name)
-#pragma warning restore CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider adding the 'required' modifier or declaring as nullable.
+        // Constructor with name parameter
+        public BookItem(string name)
         {
-            Name = name ?? throw new ArgumentNullException(nameof(name));
+            _name = name ?? throw new ArgumentNullException(nameof(name));
         }
     }
 }

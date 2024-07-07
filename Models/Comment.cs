@@ -29,7 +29,7 @@ namespace api.Models
         public int BookItemId { get; set; }
 
         [ForeignKey("BookItemId")]
-        public BookItemBase? BookItem { get; set; }
+        public BookItem? BookItem { get; set; }
 
         // One-to-many relationship: a comment can have many replies
         public ICollection<Comment> Replies { get; set; } = new List<Comment>();

@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using api.Dtos.Account;
 using api.Dtos.User;
 using api.Models;
 
@@ -14,6 +15,7 @@ namespace api.Interfaces
         Task<string> DeleteUserAsync(string id);
         Task<string> ConfirmEmailAsync(string email);
         Task<string> UpdateUserAsync(UpdateUserDto updateUserDto);
-
+        Task<NewUserDto?> LoginAsync(LoginDto loginDto);
+        Task<NewUserDto?> RegisterAsync(RegisterDto registerDto); 
     }
 }

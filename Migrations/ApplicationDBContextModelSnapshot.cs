@@ -51,43 +51,43 @@ namespace api.Migrations
                     b.HasData(
                         new
                         {
-                            Id = "2caba31f-9cc4-46d2-a61a-c9e8615b6598",
+                            Id = "16bc1d17-33d0-4de8-8f24-551dc141866f",
                             Name = "Admin",
                             NormalizedName = "ADMIN"
                         },
                         new
                         {
-                            Id = "728673fa-fbf9-4531-b6ea-f888a07127f6",
+                            Id = "aafb858a-b70e-4365-9604-1a14a668d3f0",
                             Name = "User",
                             NormalizedName = "USER"
                         },
                         new
                         {
-                            Id = "aab3fc2f-e619-4850-87b2-d661d911fd52",
+                            Id = "06041b11-722e-455f-96e0-2dc7b06b33c3",
                             Name = "Moderator",
                             NormalizedName = "MODERATOR"
                         },
                         new
                         {
-                            Id = "d5a978c2-95c8-43c4-bf33-5c001ad74d15",
+                            Id = "53c7d546-549f-415e-9370-ee4353a96dee",
                             Name = "Editor",
                             NormalizedName = "EDITOR"
                         },
                         new
                         {
-                            Id = "ed6dee2e-ee7a-4dd9-ac5e-18af77ec892a",
+                            Id = "29748051-f8a7-4ade-be6e-175a0053b033",
                             Name = "Creator",
                             NormalizedName = "CREATOR"
                         },
                         new
                         {
-                            Id = "7dd2e853-4419-40a7-a52a-9f9aa4182f84",
+                            Id = "2484f399-1802-446f-9103-4349a6f2d950",
                             Name = "Premium",
                             NormalizedName = "PREMIUM"
                         },
                         new
                         {
-                            Id = "2b8367d9-df3a-42a8-9d04-62c6fd66ce2b",
+                            Id = "78780b69-0fd6-4a52-bd2d-ee3d2ad38780",
                             Name = "Guest",
                             NormalizedName = "GUEST"
                         });
@@ -178,6 +178,13 @@ namespace api.Migrations
                     b.HasIndex("RoleId");
 
                     b.ToTable("AspNetUserRoles", (string)null);
+
+                    b.HasData(
+                        new
+                        {
+                            UserId = "e631af9f-21ce-433a-8d44-40b34afb78ed",
+                            RoleId = "16bc1d17-33d0-4de8-8f24-551dc141866f"
+                        });
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserToken<string>", b =>
@@ -211,7 +218,9 @@ namespace api.Migrations
                         .HasColumnType("int");
 
                     b.Property<string>("Name")
-                        .HasColumnType("nvarchar(max)");
+                        .IsRequired()
+                        .HasMaxLength(1000)
+                        .HasColumnType("nvarchar(1000)");
 
                     b.HasKey("AnotherNameId");
 
@@ -226,6 +235,9 @@ namespace api.Migrations
                         .HasColumnType("nvarchar(450)");
 
                     b.Property<int>("AccessFailedCount")
+                        .HasColumnType("int");
+
+                    b.Property<int>("Balance")
                         .HasColumnType("int");
 
                     b.Property<string>("ConcurrencyStamp")
@@ -294,7 +306,31 @@ namespace api.Migrations
                         .HasDatabaseName("UserNameIndex")
                         .HasFilter("[NormalizedUserName] IS NOT NULL");
 
+                    b.HasIndex("UserName")
+                        .IsUnique()
+                        .HasFilter("[UserName] IS NOT NULL");
+
                     b.ToTable("AspNetUsers", (string)null);
+
+                    b.HasData(
+                        new
+                        {
+                            Id = "e631af9f-21ce-433a-8d44-40b34afb78ed",
+                            AccessFailedCount = 0,
+                            Balance = 0,
+                            ConcurrencyStamp = "581ef8b7-d903-4bfc-9a7b-13835433f88e",
+                            Email = "admin@localhost",
+                            EmailConfirmed = true,
+                            LockoutEnabled = false,
+                            LockoutEnd = new DateTimeOffset(new DateTime(2024, 7, 6, 1, 33, 12, 217, DateTimeKind.Unspecified).AddTicks(7330), new TimeSpan(0, 0, 0, 0, 0)),
+                            NormalizedEmail = "ADMIN@LOCALHOST",
+                            NormalizedUserName = "ADMIN",
+                            PasswordHash = "AQAAAAIAAYagAAAAEMS2YLLs0rGyk7ndTcxMQGEtbVSaBdlBT9isGaMFuPbx4EfqD3JI+PWKzrUBcAsYTg==",
+                            PhoneNumberConfirmed = false,
+                            SecurityStamp = "d1597c33-11c9-4016-bf86-6da91917049d",
+                            TwoFactorEnabled = false,
+                            UserName = "admin"
+                        });
                 });
 
             modelBuilder.Entity("api.Models.Author", b =>
@@ -306,14 +342,16 @@ namespace api.Migrations
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("AuthorId"));
 
                     b.Property<string>("Biography")
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(2000)
+                        .HasColumnType("nvarchar(2000)");
 
                     b.Property<DateTime>("DateOfBirth")
                         .HasColumnType("datetime2");
 
                     b.Property<string>("Pseudonym")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
 
                     b.HasKey("AuthorId");
 
@@ -328,6 +366,9 @@ namespace api.Migrations
                     b.Property<int>("CategoryId")
                         .HasColumnType("int");
 
+                    b.Property<int>("BookCategoryId")
+                        .HasColumnType("int");
+
                     b.HasKey("BookId", "CategoryId");
 
                     b.HasIndex("CategoryId");
@@ -335,7 +376,7 @@ namespace api.Migrations
                     b.ToTable("BookCategories");
                 });
 
-            modelBuilder.Entity("api.Models.BookItemBase", b =>
+            modelBuilder.Entity("api.Models.BookItem", b =>
                 {
                     b.Property<int>("BookId")
                         .ValueGeneratedOnAdd()
@@ -374,11 +415,11 @@ namespace api.Migrations
 
                     b.Property<string>("Name")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("NameUrl")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("OwnerId")
                         .IsRequired()
@@ -400,11 +441,46 @@ namespace api.Migrations
 
                     b.HasIndex("AuthorId");
 
+                    b.HasIndex("Name")
+                        .IsUnique();
+
+                    b.HasIndex("NameUrl")
+                        .IsUnique();
+
                     b.HasIndex("OwnerId");
 
-                    b.ToTable("BookItems", (string)null);
+                    b.ToTable("BookItems");
+                });
 
-                    b.UseTptMappingStrategy();
+            modelBuilder.Entity("api.Models.BookLine", b =>
+                {
+                    b.Property<int>("BookLineId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("BookLineId"));
+
+                    b.Property<int>("ChapterId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("LineNumber")
+                        .HasColumnType("int");
+
+                    b.Property<int>("StyleParagraph")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Text")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("BookLineId");
+
+                    b.HasIndex("ChapterId");
+
+                    b.HasIndex("LineNumber", "ChapterId")
+                        .IsUnique();
+
+                    b.ToTable("BookLine");
                 });
 
             modelBuilder.Entity("api.Models.BookTag", b =>
@@ -439,7 +515,7 @@ namespace api.Migrations
                     b.ToTable("Categories");
                 });
 
-            modelBuilder.Entity("api.Models.Chapter", b =>
+            modelBuilder.Entity("api.Models.ChapterBase", b =>
                 {
                     b.Property<int>("ChapterId")
                         .ValueGeneratedOnAdd()
@@ -447,14 +523,21 @@ namespace api.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("ChapterId"));
 
+                    b.Property<int>("BookItemId")
+                        .HasColumnType("int");
+
                     b.Property<int>("ChapterNumber")
                         .HasColumnType("int");
 
                     b.Property<string>("Content")
                         .IsRequired()
+                        .HasMaxLength(5000)
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("MangaId")
+                    b.Property<int>("LanguageId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("Price")
                         .HasColumnType("int");
 
                     b.Property<DateTime>("PublishedDate")
@@ -462,16 +545,28 @@ namespace api.Migrations
 
                     b.Property<string>("Title")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
 
-                    b.Property<int>("viewed")
+                    b.Property<string>("UserId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<int>("Viewed")
                         .HasColumnType("int");
 
                     b.HasKey("ChapterId");
 
-                    b.HasIndex("MangaId");
+                    b.HasIndex("BookItemId");
 
-                    b.ToTable("Chapters");
+                    b.HasIndex("UserId");
+
+                    b.HasIndex("ChapterNumber", "BookItemId")
+                        .IsUnique();
+
+                    b.ToTable("Chapters", (string)null);
+
+                    b.UseTptMappingStrategy();
                 });
 
             modelBuilder.Entity("api.Models.Comment", b =>
@@ -483,6 +578,9 @@ namespace api.Migrations
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("CommentId"));
 
                     b.Property<int>("BookItemId")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("ChapterBaseChapterId")
                         .HasColumnType("int");
 
                     b.Property<string>("Content")
@@ -506,6 +604,8 @@ namespace api.Migrations
 
                     b.HasIndex("BookItemId");
 
+                    b.HasIndex("ChapterBaseChapterId");
+
                     b.HasIndex("ParentCommentId");
 
                     b.HasIndex("UserId");
@@ -521,10 +621,10 @@ namespace api.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("EmojiId"));
 
-                    b.Property<int>("NumberEmoji")
+                    b.Property<int>("EmojiNumber")
                         .HasColumnType("int");
 
-                    b.Property<string>("Url")
+                    b.Property<string>("EmojiUrl")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
@@ -544,18 +644,48 @@ namespace api.Migrations
                     b.Property<int>("ChapterId")
                         .HasColumnType("int");
 
-                    b.Property<int>("NumericalOrder")
-                        .HasColumnType("int");
-
-                    b.Property<string>("Url")
+                    b.Property<string>("ImageUrl")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("NumericalOrder")
+                        .HasColumnType("int");
 
                     b.HasKey("ImageId");
 
                     b.HasIndex("ChapterId");
 
+                    b.HasIndex("NumericalOrder", "ChapterId")
+                        .IsUnique();
+
                     b.ToTable("Images");
+                });
+
+            modelBuilder.Entity("api.Models.Purchase", b =>
+                {
+                    b.Property<int>("PurchaseId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("PurchaseId"));
+
+                    b.Property<string>("AppUserId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<int>("ChapterId")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("PurchaseDate")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("PurchaseId");
+
+                    b.HasIndex("AppUserId");
+
+                    b.HasIndex("ChapterId");
+
+                    b.ToTable("Purchases");
                 });
 
             modelBuilder.Entity("api.Models.Tag", b =>
@@ -575,10 +705,38 @@ namespace api.Migrations
                     b.ToTable("Tags");
                 });
 
+            modelBuilder.Entity("api.Models.Transaction", b =>
+                {
+                    b.Property<string>("TransactionId")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<int>("Amount")
+                        .HasColumnType("int");
+
+                    b.Property<string>("AppUserId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<int>("Coins")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("TransactionDate")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("TransactionId");
+
+                    b.HasIndex("AppUserId");
+
+                    b.ToTable("Transactions");
+                });
+
             modelBuilder.Entity("api.Models.UserBook", b =>
                 {
-                    b.Property<string>("UserId")
-                        .HasColumnType("nvarchar(450)");
+                    b.Property<int>("UserBookId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("UserBookId"));
 
                     b.Property<int>("BookItemId")
                         .HasColumnType("int");
@@ -592,15 +750,19 @@ namespace api.Migrations
                     b.Property<int>("Rating")
                         .HasColumnType("int");
 
-                    b.Property<int>("UserBookId")
-                        .HasColumnType("int");
+                    b.Property<string>("UserId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<int>("Viewed")
                         .HasColumnType("int");
 
-                    b.HasKey("UserId", "BookItemId");
+                    b.HasKey("UserBookId");
 
-                    b.HasIndex("BookItemId");
+                    b.HasIndex("UserId");
+
+                    b.HasIndex("BookItemId", "UserId")
+                        .IsUnique();
 
                     b.ToTable("UserBooks");
                 });
@@ -611,39 +773,56 @@ namespace api.Migrations
                         .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("Address")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("AppUserId")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
 
                     b.Property<string>("AvatarURL")
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
 
                     b.Property<DateTime>("DateOfBirth")
                         .HasColumnType("datetime2");
 
                     b.Property<string>("FirstName")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
 
                     b.Property<int>("Gender")
                         .HasColumnType("int");
 
                     b.Property<string>("LastName")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<string>("UserId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
 
                     b.HasKey("UserProfileId");
+
+                    b.HasIndex("UserId")
+                        .IsUnique();
 
                     b.ToTable("UserProfiles");
                 });
 
-            modelBuilder.Entity("api.Models.Manga", b =>
+            modelBuilder.Entity("api.Models.MangaChapter", b =>
                 {
-                    b.HasBaseType("api.Models.BookItemBase");
+                    b.HasBaseType("api.Models.ChapterBase");
 
-                    b.ToTable("Mangas", (string)null);
+                    b.ToTable("MangaChapters", (string)null);
+                });
+
+            modelBuilder.Entity("api.Models.NovelChapter", b =>
+                {
+                    b.HasBaseType("api.Models.ChapterBase");
+
+                    b.Property<float>("Volume")
+                        .HasColumnType("real");
+
+                    b.ToTable("NovelChapters", (string)null);
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
@@ -699,18 +878,18 @@ namespace api.Migrations
 
             modelBuilder.Entity("api.Models.AnotherName", b =>
                 {
-                    b.HasOne("api.Models.BookItemBase", "BookItemBase")
+                    b.HasOne("api.Models.BookItem", "BookItem")
                         .WithMany("AnotherNames")
                         .HasForeignKey("BookId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("BookItemBase");
+                    b.Navigation("BookItem");
                 });
 
             modelBuilder.Entity("api.Models.BookCategory", b =>
                 {
-                    b.HasOne("api.Models.BookItemBase", "BookItem")
+                    b.HasOne("api.Models.BookItem", "BookItem")
                         .WithMany("BookCategories")
                         .HasForeignKey("BookId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -727,7 +906,7 @@ namespace api.Migrations
                     b.Navigation("Category");
                 });
 
-            modelBuilder.Entity("api.Models.BookItemBase", b =>
+            modelBuilder.Entity("api.Models.BookItem", b =>
                 {
                     b.HasOne("api.Models.Author", "Author")
                         .WithMany("BookItems")
@@ -746,9 +925,20 @@ namespace api.Migrations
                     b.Navigation("Author");
                 });
 
+            modelBuilder.Entity("api.Models.BookLine", b =>
+                {
+                    b.HasOne("api.Models.NovelChapter", "Chapter")
+                        .WithMany("LineItems")
+                        .HasForeignKey("ChapterId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Chapter");
+                });
+
             modelBuilder.Entity("api.Models.BookTag", b =>
                 {
-                    b.HasOne("api.Models.BookItemBase", "BookItem")
+                    b.HasOne("api.Models.BookItem", "BookItem")
                         .WithMany("BookTags")
                         .HasForeignKey("BookId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -765,24 +955,36 @@ namespace api.Migrations
                     b.Navigation("Tag");
                 });
 
-            modelBuilder.Entity("api.Models.Chapter", b =>
+            modelBuilder.Entity("api.Models.ChapterBase", b =>
                 {
-                    b.HasOne("api.Models.Manga", "Manga")
-                        .WithMany("Chapters")
-                        .HasForeignKey("MangaId")
+                    b.HasOne("api.Models.BookItem", "BookItem")
+                        .WithMany("ChapterList")
+                        .HasForeignKey("BookItemId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("Manga");
+                    b.HasOne("api.Models.AppUser", "AppUser")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("AppUser");
+
+                    b.Navigation("BookItem");
                 });
 
             modelBuilder.Entity("api.Models.Comment", b =>
                 {
-                    b.HasOne("api.Models.BookItemBase", "BookItem")
+                    b.HasOne("api.Models.BookItem", "BookItem")
                         .WithMany("Comments")
                         .HasForeignKey("BookItemId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.HasOne("api.Models.ChapterBase", null)
+                        .WithMany("Comments")
+                        .HasForeignKey("ChapterBaseChapterId");
 
                     b.HasOne("api.Models.Comment", "ParentComment")
                         .WithMany("Replies")
@@ -804,7 +1006,7 @@ namespace api.Migrations
 
             modelBuilder.Entity("api.Models.Images", b =>
                 {
-                    b.HasOne("api.Models.Chapter", "Chapter")
+                    b.HasOne("api.Models.MangaChapter", "Chapter")
                         .WithMany("ImageItems")
                         .HasForeignKey("ChapterId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -813,9 +1015,39 @@ namespace api.Migrations
                     b.Navigation("Chapter");
                 });
 
+            modelBuilder.Entity("api.Models.Purchase", b =>
+                {
+                    b.HasOne("api.Models.AppUser", "AppUser")
+                        .WithMany("Purchases")
+                        .HasForeignKey("AppUserId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("api.Models.ChapterBase", "Chapter")
+                        .WithMany("Purchases")
+                        .HasForeignKey("ChapterId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("AppUser");
+
+                    b.Navigation("Chapter");
+                });
+
+            modelBuilder.Entity("api.Models.Transaction", b =>
+                {
+                    b.HasOne("api.Models.AppUser", "AppUser")
+                        .WithMany("Transactions")
+                        .HasForeignKey("AppUserId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("AppUser");
+                });
+
             modelBuilder.Entity("api.Models.UserBook", b =>
                 {
-                    b.HasOne("api.Models.BookItemBase", "BookItem")
+                    b.HasOne("api.Models.BookItem", "BookItem")
                         .WithMany("UserBooks")
                         .HasForeignKey("BookItemId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -836,18 +1068,27 @@ namespace api.Migrations
                 {
                     b.HasOne("api.Models.AppUser", "AppUser")
                         .WithOne("UserProfile")
-                        .HasForeignKey("api.Models.UserProfile", "UserProfileId")
+                        .HasForeignKey("api.Models.UserProfile", "UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.Navigation("AppUser");
                 });
 
-            modelBuilder.Entity("api.Models.Manga", b =>
+            modelBuilder.Entity("api.Models.MangaChapter", b =>
                 {
-                    b.HasOne("api.Models.BookItemBase", null)
+                    b.HasOne("api.Models.ChapterBase", null)
                         .WithOne()
-                        .HasForeignKey("api.Models.Manga", "BookId")
+                        .HasForeignKey("api.Models.MangaChapter", "ChapterId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("api.Models.NovelChapter", b =>
+                {
+                    b.HasOne("api.Models.ChapterBase", null)
+                        .WithOne()
+                        .HasForeignKey("api.Models.NovelChapter", "ChapterId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });
@@ -857,6 +1098,10 @@ namespace api.Migrations
                     b.Navigation("BookItems");
 
                     b.Navigation("Comments");
+
+                    b.Navigation("Purchases");
+
+                    b.Navigation("Transactions");
 
                     b.Navigation("UserBooks");
 
@@ -868,13 +1113,15 @@ namespace api.Migrations
                     b.Navigation("BookItems");
                 });
 
-            modelBuilder.Entity("api.Models.BookItemBase", b =>
+            modelBuilder.Entity("api.Models.BookItem", b =>
                 {
                     b.Navigation("AnotherNames");
 
                     b.Navigation("BookCategories");
 
                     b.Navigation("BookTags");
+
+                    b.Navigation("ChapterList");
 
                     b.Navigation("Comments");
 
@@ -886,9 +1133,11 @@ namespace api.Migrations
                     b.Navigation("BookCategories");
                 });
 
-            modelBuilder.Entity("api.Models.Chapter", b =>
+            modelBuilder.Entity("api.Models.ChapterBase", b =>
                 {
-                    b.Navigation("ImageItems");
+                    b.Navigation("Comments");
+
+                    b.Navigation("Purchases");
                 });
 
             modelBuilder.Entity("api.Models.Comment", b =>
@@ -901,9 +1150,14 @@ namespace api.Migrations
                     b.Navigation("BookTags");
                 });
 
-            modelBuilder.Entity("api.Models.Manga", b =>
+            modelBuilder.Entity("api.Models.MangaChapter", b =>
                 {
-                    b.Navigation("Chapters");
+                    b.Navigation("ImageItems");
+                });
+
+            modelBuilder.Entity("api.Models.NovelChapter", b =>
+                {
+                    b.Navigation("LineItems");
                 });
 #pragma warning restore 612, 618
         }

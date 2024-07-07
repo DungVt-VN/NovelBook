@@ -8,30 +8,34 @@ namespace api.Models
     public class UserProfile
     {
         [Key]
-        public string? UserProfileId { get; set; }
+        public string? UserProfileId { get; set; } = Guid.NewGuid().ToString();// UserProfileId là khóa chính
 
         [Url]
+        [MaxLength(500, ErrorMessage = "Avatar URL cannot exceed 500 characters")]
         public string? AvatarURL { get; set; }
 
         [Required(ErrorMessage = "FirstName is required")]
+        [MaxLength(100, ErrorMessage = "FirstName cannot exceed 100 characters")]
         public string FirstName { get; set; } = string.Empty;
 
         [Required(ErrorMessage = "LastName is required")]
+        [MaxLength(100, ErrorMessage = "LastName cannot exceed 100 characters")]
         public string LastName { get; set; } = string.Empty;
 
         [Required(ErrorMessage = "DateOfBirth is required")]
-        public DateTime DateOfBirth { get; set; } = DateTime.Now;
+        [DataType(DataType.Date)]
+        public DateTime DateOfBirth { get; set; }
 
         [Required(ErrorMessage = "Gender is required")]
         public GenderEnum Gender { get; set; } = GenderEnum.None;
 
-        public string? Address { get; set; } = string.Empty;
+        [MaxLength(200, ErrorMessage = "Address cannot exceed 200 characters")]
+        public string? Address { get; set; }
 
         [Required]
-        [ForeignKey("AppUser")]
-        public string AppUserId { get; set; } = string.Empty;
+        public string UserId { get; set; } = string.Empty;
 
-        [Required]
+        [ForeignKey("UserId")]
         public AppUser AppUser { get; set; } = new AppUser();
     }
 }
